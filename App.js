@@ -8,7 +8,8 @@ import {
   View,
   Button,
   ScrollView,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import BleManager from 'react-native-ble-manager';
 
@@ -116,20 +117,33 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
+      
         <View style={styles.title}>
           <Text style={styles.titleText}>GiS</Text>
         </View>
         <View style={styles.header}>
           <View style={styles.connectionStatus}>
-            <View style={styles.statusCircleWrapper}>
-              <View style={[styles.statusCircle, this.state.peripheral && this.state.peripheral.connected ? { backgroundColor: '#55DA48' } : { backgroundColor: 'red' } ]} />
-            </View>
-            <Image
-              style={{width: 50, height: 50, marginLeft: 5}}
-              source={require('./assets/car-b&w.png')}
-            />
+            {
+              (this.state.peripheral && this.state.peripheral.connected) ?
+              <Image
+                style={{width: 50, height: 50, marginLeft: 5}}
+                source={require(`./assets/car-check.png`)}
+              />
+              :
+              <Image
+                style={{width: 50, height: 50, marginLeft: 5}}
+                source={require(`./assets/car-cross.png`)}
+              />
+            }
+            
           </View>
         </View>
+        {
+          this.state.lostConnectionTime > 0 &&
+            <View style={styles.contingency}>
+                <Text style={{ marginRight: 5 }}>reconnecting</Text><ActivityIndicator size="small" color="#00ff00" />
+            </View>
+        }
         <View style={styles.body}>
         <ScrollView>
           <View>  
@@ -165,10 +179,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   header: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignSelf: 'stretch',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingRight: 5,
     paddingLeft: 5,
     borderBottomWidth: 1,
@@ -180,21 +194,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
   },
-  connectionStatus: {
+  contingency: {
+    margin: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  statusCircleWrapper: {
-    height: 30,
-    width: 30,
-    borderRadius: 5,
-    borderBottomColor: '#111',
-  },
-  statusCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10
+    justifyContent: 'center',
   },
   body: {
     alignSelf: 'stretch'
