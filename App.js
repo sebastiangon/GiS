@@ -10,9 +10,11 @@ import {
   Button,
   ScrollView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  AppState
 } from 'react-native';
 import BleManager from 'react-native-ble-manager';
+import PushNotification from 'react-native-push-notification';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -52,6 +54,37 @@ export default class App extends Component {
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
     this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
+
+    this.handleAppStateChange = this.handleAppStateChange.bind(this);
+
+    AppState.addEventListener('change', this.handleAppStateChange);
+
+    PushNotification.configure({
+      onNotification: function(notification) {
+        console.log( 'NOTIFICATION:', notification );
+        // notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true
+      },
+    });
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this.handleAppStateChange);
+  }
+
+  handleAppStateChange(appState) {
+    if(appState === 'background') {
+      let date = new Date(Date.now() + (5 * 1000));
+
+      PushNotification.localNotificationSchedule({
+        message: "My Notification Message",
+        date,
+      });
+    }
   }
 
   log(text) {
