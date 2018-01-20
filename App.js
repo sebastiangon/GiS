@@ -1,20 +1,9 @@
 import React, { Component } from 'react';
 import { stringToBytes, bytesToString } from 'convert-string';
-import {
-  Platform,
-  StyleSheet,
-  NativeModules,
-  NativeEventEmitter,
-  Text,
-  View,
-  Button,
-  ScrollView,
-  Image,
-  ActivityIndicator,
-  AppState
-} from 'react-native';
+import { StyleSheet, NativeModules, NativeEventEmitter, Text, View, Button, ScrollView, Image, ActivityIndicator, AppState } from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import PushNotification from 'react-native-push-notification';
+import * as BTConfig from './bluetooth.config';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -29,10 +18,6 @@ export default class App extends Component {
       lostConnectionTime: 0
     }
     this.lostConnectionIntervalId = null;
-    this.carPeripheralId = '476EF5B5-3DB0-0AF7-D5F7-6BA7262B2169';
-    this.carService = 'FFE0';
-    this.carCharacteristic = 'FFE1';
-    this.scanSeconds = 3;
     this.log = this.log.bind(this);
     this.startScan = this.startScan.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
@@ -47,7 +32,7 @@ export default class App extends Component {
     BleManager.start({showAlert: false})
       .then(() => {
         this.log('Bluetooth Module initialized')
-        this.startScan(this.carPeripheralId, this.scanSeconds);
+        this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
       });
 
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral );
@@ -62,7 +47,6 @@ export default class App extends Component {
     PushNotification.configure({
       onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
-        // notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
       permissions: {
         alert: true,
@@ -103,7 +87,7 @@ export default class App extends Component {
 
   handleDiscoverPeripheral(peripheral) {
     const connectedPeripheral = this.state.peripheral;
-    if (peripheral.id === this.carPeripheralId) {
+    if (peripheral.id === BTConfig.carPeripheralId) {
       this.setState({ peripheral })
       BleManager.stopScan()
         .then(() => { this.handleStopScan() })
@@ -118,7 +102,7 @@ export default class App extends Component {
       this.startSync(this.state.peripheral);
     } else {
       this.log('Not close enought to your car, retrying...');
-      this.startScan(this.carPeripheralId, this.scanSeconds);
+      this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
     }
   }
 
@@ -139,10 +123,10 @@ export default class App extends Component {
   sendNotificationToCar(peripheral) {
       BleManager.retrieveServices(peripheral.id).then(() => {
         setTimeout(() => {
-          BleManager.startNotification(peripheral.id, this.carService, this.carCharacteristic).then(() => {
+          BleManager.startNotification(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic).then(() => {
             this.log(`started notification on ${peripheral.id}`);
             setTimeout(() => {
-              BleManager.write(peripheral.id, this.carService, this.carCharacteristic, stringToBytes('APP - send ping')).then(() => {
+              BleManager.write(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes('APP - send ping')).then(() => {
                 this.log(`APP - send ping`);
               });                    
 
@@ -157,12 +141,6 @@ export default class App extends Component {
   handleUpdateValueForCharacteristic(data) {
     const value = bytesToString(data.value);
     this.log(value);
-    // if ( value.includes('pote_value')) {
-    //   const intValue = parseInt(value.split('=')[1]);
-    //   this.setState({
-    //     powerBar: intValue
-    //   });
-    // }
   }
 
   handleDisconnectedPeripheral() {
@@ -172,7 +150,7 @@ export default class App extends Component {
     this.lostConnectionIntervalId = setInterval(() => {
       this.setState({ lostConnectionTime: this.state.lostConnectionTime += 1 });
     },1000);
-    this.startScan(this.carPeripheralId, this.scanSeconds);
+    this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
   }
 
   componentWillUnmount() {
