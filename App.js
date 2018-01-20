@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { stringToBytes, bytesToString } from 'convert-string';
 import {
   Platform,
   StyleSheet,
@@ -27,6 +28,8 @@ export default class App extends Component {
     }
     this.lostConnectionIntervalId = null;
     this.carPeripheralId = '476EF5B5-3DB0-0AF7-D5F7-6BA7262B2169';
+    this.carService = 'FFE0';
+    this.carCharacteristic = 'FFE1';
     this.scanSeconds = 3;
     this.log = this.log.bind(this);
     this.startScan = this.startScan.bind(this);
@@ -34,6 +37,7 @@ export default class App extends Component {
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
     this.handleDisconnectedPeripheral = this.handleDisconnectedPeripheral.bind(this);
+    this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
     this.startSync = this.startSync.bind(this);
   }
 
@@ -47,6 +51,7 @@ export default class App extends Component {
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral );
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
+    this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
   }
 
   log(text) {
@@ -91,12 +96,42 @@ export default class App extends Component {
         lostConnectionTime: 0
       });
       clearInterval(this.lostConnectionIntervalId);
+      this.sendNotificationToCar(peripheral);
       this.log(`Connected to ${peripheral.id}`);
     }).catch((error) => {
       this.log(`Connection error ${error}`);
     });
   }
+
+  sendNotificationToCar(peripheral) {
+      BleManager.retrieveServices(peripheral.id).then(() => {
+        setTimeout(() => {
+          BleManager.startNotification(peripheral.id, this.carService, this.carCharacteristic).then(() => {
+            this.log(`started notification on ${peripheral.id}`);
+            setTimeout(() => {
+              BleManager.write(peripheral.id, this.carService, this.carCharacteristic, stringToBytes('APP - send ping')).then(() => {
+                this.log(`APP - send ping`);
+              });                    
+
+            }, 500);
+          }).catch((error) => {
+            console.error('Notification error', error);
+          });
+        }, 300);
+      });
+  }
   
+  handleUpdateValueForCharacteristic(data) {
+    const value = bytesToString(data.value);
+    this.log(value);
+    // if ( value.includes('pote_value')) {
+    //   const intValue = parseInt(value.split('=')[1]);
+    //   this.setState({
+    //     powerBar: intValue
+    //   });
+    // }
+  }
+
   handleDisconnectedPeripheral() {
     this.log('Lost connection with car, reconnectig...');
     this.setState({ peripheral: null });
