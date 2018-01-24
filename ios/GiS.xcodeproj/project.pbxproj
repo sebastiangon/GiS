@@ -744,6 +744,7 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = K26K9S55YG;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
@@ -1254,6 +1255,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = K26K9S55YG;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1283,6 +1285,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = K26K9S55YG;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
@@ -1322,7 +1325,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.GiS-0.1";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.GiS-1.0";
 				PRODUCT_NAME = GiS;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1346,7 +1349,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.GiS-0.1";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.GiS-1.0";
 				PRODUCT_NAME = GiS;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { stringToBytes, bytesToString } from 'convert-string';
-import { StyleSheet, NativeModules, NativeEventEmitter, Text, View, Button, ScrollView, Image, ActivityIndicator, AppState } from 'react-native';
+import { NativeModules, NativeEventEmitter, Text, View, Button, ScrollView, Image, ActivityIndicator, AppState } from 'react-native';
+
+import * as notiService from '../utils/notificationService';
+
 import BleManager from 'react-native-ble-manager';
-import PushNotification from 'react-native-push-notification';
-import * as BTConfig from './bluetooth.config';
+import * as BTConfig from '../utils/bluetooth.config';
+
+import styles from './Styles';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -26,6 +30,7 @@ export default class App extends Component {
     this.handleDisconnectedPeripheral = this.handleDisconnectedPeripheral.bind(this);
     this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
     this.startSync = this.startSync.bind(this);
+    this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
 
   componentDidMount() {
@@ -40,20 +45,14 @@ export default class App extends Component {
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
     this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
 
-    this.handleAppStateChange = this.handleAppStateChange.bind(this);
-
     AppState.addEventListener('change', this.handleAppStateChange);
+    
+    notiService.init(this.onPushNotification.bind(this));
+  }
 
-    PushNotification.configure({
-      onNotification: function(notification) {
-        console.log( 'NOTIFICATION:', notification );
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true
-      },
-    });
+  onPushNotification(noti) {
+    console.log(`onPushNotification fired ${JSON.stringify(noti)}`);
+    this.log(`onPushNotification fired ${JSON.stringify(noti)}`);
   }
 
   componentWillUnmount() {
@@ -62,12 +61,9 @@ export default class App extends Component {
 
   handleAppStateChange(appState) {
     if(appState === 'background') {
-      let date = new Date(Date.now() + (5 * 1000));
+      let date = new Date(Date.now() + (3 * 1000));
 
-      PushNotification.localNotificationSchedule({
-        message: "My Notification Message",
-        date,
-      });
+      notiService.scheduleNotification('${NotificationMessage}', date)
     }
   }
 
@@ -106,8 +102,9 @@ export default class App extends Component {
     }
   }
 
-  startSync(peripheral) {
-    BleManager.connect(peripheral.id).then(() => {
+  async startSync(peripheral) {
+    try {
+      await BleManager.connect(peripheral.id);
       this.setState({ 
         peripheral: { ...peripheral, connected: true },
         lostConnectionTime: 0
@@ -115,27 +112,22 @@ export default class App extends Component {
       clearInterval(this.lostConnectionIntervalId);
       this.sendNotificationToCar(peripheral);
       this.log(`Connected to ${peripheral.id}`);
-    }).catch((error) => {
-      this.log(`Connection error ${error}`);
-    });
+    }
+    catch(e) {
+      this.log(`Error sync bluetooth - ${e.message}`);
+    }
   }
 
-  sendNotificationToCar(peripheral) {
-      BleManager.retrieveServices(peripheral.id).then(() => {
-        setTimeout(() => {
-          BleManager.startNotification(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic).then(() => {
-            this.log(`started notification on ${peripheral.id}`);
-            setTimeout(() => {
-              BleManager.write(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes('APP - send ping')).then(() => {
-                this.log(`APP - send ping`);
-              });                    
-
-            }, 500);
-          }).catch((error) => {
-            console.error('Notification error', error);
-          });
-        }, 300);
-      });
+  async sendNotificationToCar(peripheral) {
+    await BleManager.retrieveServices(peripheral.id);
+    setTimeout(async () => {
+      await BleManager.startNotification(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
+      this.log(`started notification on ${peripheral.id}`);
+      setTimeout(async () => {
+        await BleManager.write(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes('APP - send ping'));
+        this.log(`APP - send ping`);         
+      }, 500);
+    }, 300);
   }
   
   handleUpdateValueForCharacteristic(data) {
@@ -173,15 +165,14 @@ export default class App extends Component {
               (this.state.peripheral && this.state.peripheral.connected) ?
               <Image
                 style={{width: 50, height: 50, marginLeft: 5}}
-                source={require(`./assets/car-check.png`)}
+                source={require(`../assets/car-check.png`)}
               />
               :
               <Image
                 style={{width: 50, height: 50, marginLeft: 5}}
-                source={require(`./assets/car-cross.png`)}
+                source={require(`../assets/car-cross.png`)}
               />
             }
-            
           </View>
         </View>
         {
@@ -204,49 +195,3 @@ export default class App extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 35,
-    justifyContent: 'center',
-    alignItems: 'stretch'
-  },
-  title: {
-    flexDirection: 'row',
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingRight: 5,
-    paddingLeft: 5,
-    backgroundColor: '#FBB554',
-  },
-  titleText: {
-    fontSize: 20,
-    color: '#eee',
-    fontWeight: 'bold'
-  },
-  header: {
-    flexDirection: 'row',
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingRight: 5,
-    paddingLeft: 5,
-    borderBottomWidth: 1,
-    borderRadius: 3,
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 0,
-    shadowColor: '#ffcf8e',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-  },
-  contingency: {
-    margin: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  body: {
-    alignSelf: 'stretch'
-  }
-});
