@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { NativeEventEmitter, Text, View, Button, ScrollView, Image, ActivityIndicator, AppState } from 'react-native';
+import { NativeEventEmitter, Text, View, Button, ScrollView, ActivityIndicator, AppState } from 'react-native';
+
+import Header from './Header/Header';
 
 import * as notiService from '../utils/notificationService';
 import { Bluetooth } from '../utils/bluetooth/bluetooth';
@@ -21,7 +23,7 @@ export default class App extends Component {
     AppState.addEventListener('change', this.handleAppStateChange);
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('stateChange', this.onBluetoothConectionStateChange);
-    this.bluetooth.init();
+    // this.bluetooth.init();
 
     notiService.init(this.onPushNotification.bind(this));
   }
@@ -50,28 +52,9 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.connectionStatus}>
-            {
-              (this.state.carConnected) ?
-              <Image
-                style={{width: 50, height: 50, marginLeft: 5}}
-                source={require(`../assets/car-check.png`)}
-              />
-              :
-              <Image
-                style={{width: 50, height: 50, marginLeft: 5}}
-                source={require(`../assets/car-cross.png`)}
-              />
-            }
-          </View>
+        <Header carConnected={this.state.carConnected} />
+        <View style={styles.body}>
         </View>
-        {
-          this.state.lostConnectionTime > 0 &&
-            <View style={styles.contingency}>
-                <Text style={{ marginRight: 5 }}>reconnecting</Text><ActivityIndicator size="small" color="#00ff00" />
-            </View>
-        }
       </View>
     );
   }
