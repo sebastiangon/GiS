@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { NativeEventEmitter, Text, View, Button, ScrollView, ActivityIndicator, AppState } from 'react-native';
+import * as mailService from './../mail_service/mailService';
 
 import Header from './Header/Header';
 
@@ -48,6 +49,21 @@ export default class App extends Component {
       notiService.scheduleNotification('${NotificationMessage}', new Date(Date.now() + (3 * 1000)));
     }
   }
+
+  handleSendMail() {
+    const mailList = [
+      {
+        to: {
+          name: 'NOMBRE CONTACTO EMERGENCIA',
+          mail: 'sebastiangon11@gmail.com'
+        },
+        from: {
+          name: 'NOMBRE DEL USER DE APP'
+        }
+      }
+    ];
+    mailService.sendMail(mailList);
+  }
   
   render() {
     return (
@@ -55,6 +71,7 @@ export default class App extends Component {
         <Header carConnected={this.state.carConnected} />
         <View style={styles.body}>
         </View>
+        <Button title="send mail" onPress={this.handleSendMail} />
       </View>
     );
   }
