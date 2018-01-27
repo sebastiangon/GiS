@@ -1,0 +1,17 @@
+{
+  "name": "mail_service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "nodemailer": "^4.4.2",
+    "nodemailer-smtp-transport": "^2.7.4",
+    "xoauth2": "^1.2.0"
+  }
+}
