@@ -3,6 +3,7 @@ import BleManager from 'react-native-ble-manager';
 import { stringToBytes, bytesToString } from 'convert-string';
 
 import * as BTConfig from './bluetooth.config';
+import { carConnectionStatusEnum } from '../carConnectionStatusEnum';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -19,6 +20,8 @@ export class Bluetooth {
 
         //Method binding
         this.init = this.init.bind(this);
+        this.addListener = this.addListener.bind(this);
+        this.dispatchListener = this.dispatchListener.bind(this);
         this.startScan = this.startScan.bind(this);
         this.startSync = this.startSync.bind(this);
         this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
@@ -57,9 +60,17 @@ export class Bluetooth {
         }
     }
 
+    dispatchListener(listener, params) {
+        const cb = this.eventListeners[listener];
+        if (cb && typeof(cb) === 'function') {
+            cb(params);
+        }
+    }
+
     startScan(carPeripheralId, scanTimeout) {
         if (!this.scanning) {
             this.peripheral = null;
+            this.dispatchListener('connectionStatusChange', {carConnectionStatus: carConnectionStatusEnum.CONNECTING});
             BleManager.scan([], scanTimeout, true).then((results) => {
                 console.log(`Bluetooth: Searching car...`);
                 this.scanning = true;
@@ -102,7 +113,7 @@ export class Bluetooth {
             clearInterval(this.lostConnectionIntervalId);
             this.sendMessageToPeripheral(this.peripheral); 
             console.log(`Bluetooth: Connected to ${peripheral.id}`);
-            this.eventListeners['stateChange']({connected: true});
+            this.dispatchListener('connectionStatusChange', {carConnectionStatus: carConnectionStatusEnum.CONNECTED});
         }
         catch(e) {
             console.log(`Bluetooth: Error sync bluetooth - ${e.message}`);
@@ -123,7 +134,6 @@ export class Bluetooth {
 
     handleDisconnectedPeripheral() {
         console.log(`Bluetooth: Lost connection with car, reconnectig...`);
-        this.eventListeners['stateChange']({connected: false});
         this.peripheral = null;
         clearInterval(this.lostConnectionIntervalId);
         this.lostConnectionIntervalId = setInterval(() => {

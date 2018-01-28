@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, ActivityIndicator } from 'react-native';
 
 import styles from './Styles';
+import { assets } from '../../assets/assets';
+import { carConnectionStatusEnum } from '../../utils/carConnectionStatusEnum';
+
 
 export default class Header extends Component {
     constructor(props) {
@@ -14,21 +17,21 @@ export default class Header extends Component {
                 <View style={styles.header}>
                     <View>
                         {
-                            (this.props.carConnected) ?
+                            (this.props.carConnectionStatus === carConnectionStatusEnum.CONNECTED) ?
                                 <Image
                                     style={{ width: 50, height: 50, marginLeft: 5 }}
-                                    source={require(`../../assets/car-check.png`)}
+                                    source={assets.carCheck}
                                 />
                                 :
                                 <Image
                                     style={{ width: 50, height: 50, marginLeft: 5 }}
-                                    source={require(`../../assets/car-cross.png`)}
+                                    source={assets.carCross}
                                 />
                         }
                     </View>
                 </View>
                 {
-                    this.state.lostConnectionTime > 0 &&
+                    this.props.carConnectionStatus === carConnectionStatusEnum.RECONNECTING &&
                     <View style={styles.contingency}>
                         <Text style={{ marginRight: 5 }}>reconnecting</Text><ActivityIndicator size="small" color="#00ff00" />
                     </View>
