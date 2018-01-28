@@ -31,9 +31,9 @@ export default class Header extends Component {
                     </View>
                 </View>
                 {
-                    this.props.carConnectionStatus === carConnectionStatusEnum.RECONNECTING &&
+                    this.props.carConnectionStatus === carConnectionStatusEnum.CONNECTING &&
                     <View style={styles.contingency}>
-                        <Text style={{ marginRight: 5 }}>reconnecting</Text><ActivityIndicator size="small" color="#00ff00" />
+                        <Text style={{ marginRight: 5 }}>Connecting car</Text><ActivityIndicator size="small" color="#00ff00" />
                     </View>
                 }
             </View>

@@ -1,5 +1,5 @@
 export const appTabsEnum = {
-    EMERGENCY_CONTACTS: 1,
-    SETTING: 2,
-    HOME: 3
+    EMERGENCY_CONTACTS: 'EMERGENCY_CONTACTS',
+    SETTINGS: 'SETTINGS',
+    LANDING: 'LANDING'
 }
