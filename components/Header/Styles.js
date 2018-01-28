@@ -9,6 +9,7 @@ export default StyleSheet.create({
         shadowColor: 'black',
         shadowOpacity: .3,
         elevation: 5,
+        zIndex: 1000
     },
     contingency: {
         margin: 5,
