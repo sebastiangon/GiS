@@ -4,7 +4,11 @@ export default StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        shadowOffset:{  width: 1,  height: 5,  },
+        shadowColor: 'black',
+        shadowOpacity: .3,
+        elevation: 5,
     },
     contingency: {
         margin: 5,

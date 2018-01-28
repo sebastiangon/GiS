@@ -9,11 +9,11 @@ export default StyleSheet.create({
     },
     activeTab: {
       flex: 1,
-      backgroundColor: 'orangered',
+      // backgroundColor: 'orangered',
     },
     scroll: {
       flex: 1,
-      backgroundColor: 'blue',
+      // backgroundColor: '#bbddee',
       marginBottom: 40
     },
   });

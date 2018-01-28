@@ -19,7 +19,7 @@ export default class App extends Component {
     super();
     this.state = {
       carConnectionStatus: false,
-      activeTab: appTabsEnum.SETTINGS
+      activeTab: appTabsEnum.EMERGENCY_CONTACTS
     };
     this.bluetooth = null;
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
