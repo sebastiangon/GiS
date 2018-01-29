@@ -17,7 +17,11 @@ export default StyleSheet.create({
         alignSelf: 'center'
     },
     listItem: {
-        margin: 10,
+        marginTop: 10,
+        marginLeft: 15,
+        marginRight: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
     listItemTitle: {
         fontWeight: '600'
@@ -36,17 +40,17 @@ export default StyleSheet.create({
     },
     floatingButtonStyle: {
         backgroundColor: '#2e6dea',
-        borderRadius: 70,
-        width: 70,
-        height: 70,
+        borderRadius: 60,
+        width: 60,
+        height: 60,
         alignItems: 'center',
         justifyContent: 'center',
     },
     floatingButtonText: {
         color: '#eee',
-        fontSize: 60,
+        fontSize: 55,
         fontWeight: '200',
         alignSelf: 'center',
-        marginBottom: 7
+        marginBottom: 6
     }
 });

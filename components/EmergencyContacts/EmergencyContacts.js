@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
+import { Text, View, Button, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
 
 import styles from './Styles';
 
@@ -36,13 +36,18 @@ export default class EmergencyContacts extends Component {
         alert('Add Contact');
     }
 
+    deleteContact() {
+        alert('Delete contact');
+    }
+
     renderEmergencyContact(contact) {
         return(
-            <TouchableOpacity activeOpacity={0.5} onPress={this.handleContactClick}>
-                <View style={styles.listItem}>
+            <TouchableOpacity style={styles.listItem} activeOpacity={0.5} onPress={this.handleContactClick}>
+                <View>
                     <Text style={styles.listItemTitle}>{contact.name}</Text>
                     <Text style={styles.listItemDetail}>{contact.mail}</Text>
                 </View>
+                <Button title="Borrar" onPress={this.deleteContact}></Button>
             </TouchableOpacity>
         );
     }
