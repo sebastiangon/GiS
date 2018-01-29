@@ -7,13 +7,13 @@ export default StyleSheet.create({
       flex: 1,
       flexDirection: 'column'
     },
+    activeTabContainer: {
+      flex:1
+    },
     activeTab: {
-      flex: 1,
-      // backgroundColor: 'orangered',
-    },
-    scroll: {
-      flex: 1,
-      // backgroundColor: '#bbddee',
-      marginBottom: 40
-    },
+      height: 200,
+      backgroundColor: '#cee4e5',
+      marginBottom: 40,
+      zIndex: 100
+    }
   });

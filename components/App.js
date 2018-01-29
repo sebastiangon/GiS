@@ -83,9 +83,11 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <Header carConnectionStatus={this.state.carConnectionStatus} />
-        <ScrollView style={[styles.activeTab, styles.scroll]}>
-          {this.renderTab(this.state.activeTab)}
-        </ScrollView>
+        <View style={styles.activeTabContainer}>
+          <ScrollView style={styles.activeTab}>
+            {this.renderTab(this.state.activeTab)}
+          </ScrollView>
+        </View>
         <TabBar onTabSelected={this.setActiveTab} activeTab={this.state.activeTab} />
       </View>
     );

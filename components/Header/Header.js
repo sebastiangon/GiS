@@ -13,7 +13,7 @@ export default class Header extends Component {
     }
     render() {
         return(
-            <View>
+            <View style={styles.index}>
                 <View style={styles.header}>
                     <View>
                         {

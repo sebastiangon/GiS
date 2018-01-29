@@ -1,6 +1,9 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
+    index: {
+        zIndex: 1000
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -8,8 +11,7 @@ export default StyleSheet.create({
         shadowOffset:{  width: 1,  height: 5,  },
         shadowColor: 'black',
         shadowOpacity: .3,
-        elevation: 5,
-        zIndex: 1000
+        elevation: 5
     },
     contingency: {
         margin: 5,

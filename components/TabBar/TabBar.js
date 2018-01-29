@@ -12,7 +12,7 @@ export default class TabBar extends Component {
     }
     render() {
         return (
-            <View>
+            <View style={styles.container}>
                 <TabNavigator>
                     <TabNavigator.Item
                         selected={this.props.activeTab === appTabsEnum.LANDING}
