@@ -20,7 +20,7 @@ export default class EmergencyContacts extends Component {
         this.setState({
             dataSource: this.ds.cloneWithRows([{
                 name: 'Rocio Diaz',
-                mail: 'chinii96@gmail.com'
+                mail: 'rociodiaz0296@gmail.com'
             }, {
                 name: 'Sebastian Gonzalez',
                 mail: 'sebastiangon11@gmail.com'
