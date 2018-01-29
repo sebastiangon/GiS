@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, ListView, TouchableHighlight, AsyncStorage } from 'react-native';
+import { Text, View, TextInput, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
 
 import styles from './Styles';
 
@@ -24,73 +24,26 @@ export default class EmergencyContacts extends Component {
             }, {
                 name: 'Sebastian Gonzalez',
                 mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
-            }, {
-                name: 'Sebastian Gonzalez',
-                mail: 'sebastiangon11@gmail.com'
             }])
         });
     }
 
     handleContactClick() {
+        alert('Contact selected');
+    }
 
+    sampleFunction() {
+        alert('Add Contact');
     }
 
     renderEmergencyContact(contact) {
         return(
-            <TouchableHighlight onPress={this.handleContactClick}>
+            <TouchableOpacity activeOpacity={0.5} onPress={this.handleContactClick}>
                 <View style={styles.listItem}>
                     <Text style={styles.listItemTitle}>{contact.name}</Text>
                     <Text style={styles.listItemDetail}>{contact.mail}</Text>
                 </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
         );
     }
 
@@ -104,6 +57,11 @@ export default class EmergencyContacts extends Component {
                     dataSource={this.state.dataSource}
                     renderRow={this.renderEmergencyContact}
                 />
+                <TouchableOpacity activeOpacity={0.5} onPress={this.sampleFunction} style={styles.touchableOpacityStyle} >
+                    <View style={styles.floatingButtonStyle}>
+                        <Text style={styles.floatingButtonText}>+</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         );
     }

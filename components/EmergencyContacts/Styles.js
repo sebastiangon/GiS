@@ -24,5 +24,29 @@ export default StyleSheet.create({
     },
     listItemDetail: {
         fontWeight: '200'
+    },
+    touchableOpacityStyle:{
+        position: 'absolute',
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 30,
+        bottom: 30,
+    },
+    floatingButtonStyle: {
+        backgroundColor: '#2e6dea',
+        borderRadius: 70,
+        width: 70,
+        height: 70,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    floatingButtonText: {
+        color: '#eee',
+        fontSize: 60,
+        fontWeight: '200',
+        alignSelf: 'center',
+        marginBottom: 7
     }
 });
