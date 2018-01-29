@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Text, View, Button, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 
+import { assets } from '../../assets/assets';
 import styles from './Styles';
 
 export default class EmergencyContacts extends Component {
@@ -13,7 +15,9 @@ export default class EmergencyContacts extends Component {
         };
         this.ds = ds;
         this.renderEmergencyContact = this.renderEmergencyContact.bind(this);
-        this.handleContactClick = this.handleContactClick.bind(this);
+        this.edit = this.edit.bind(this);
+        this.add = this.add.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     componentDidMount() {
@@ -28,30 +32,40 @@ export default class EmergencyContacts extends Component {
         });
     }
 
-    handleContactClick() {
-        alert('Contact selected');
+    edit(contact) {
+        alert(`Contact selected ${JSON.stringify(contact)}`);
     }
 
-    sampleFunction() {
-        alert('Add Contact');
+    add() {
+        alert(`Add Contact`);
     }
 
-    deleteContact() {
-        alert('Delete contact');
+    delete(contact) {
+        alert(`Delete contact ${JSON.stringify(contact)}`);
     }
 
     renderEmergencyContact(contact) {
-        return(
-            <View style={styles.listItem}>
-                <TouchableOpacity activeOpacity={0.5} onPress={this.handleContactClick}>
-                    <View>
-                        <Text style={styles.listItemTitle}>{contact.name}</Text>
-                        <Text style={styles.listItemDetail}>{contact.mail}</Text>
-                    </View>
-                </TouchableOpacity>
-                <Button title="Borrar" onPress={this.deleteContact}></Button>
-            </View>
-        );
+        let swipeBtns = [{
+            text: 'Delete',
+            backgroundColor: 'red',
+            underlayColor: '#00d',
+            onPress: () => { this.delete(contact) }
+          }];
+      
+          return (
+            <Swipeout right={swipeBtns}
+              autoClose={true}
+              backgroundColor= 'transparent'>
+                 <View style={styles.listItem}>
+                     <TouchableOpacity activeOpacity={0.5} onPress={() => {this.edit(contact)}}>
+                         <View>
+                             <Text style={styles.listItemTitle}>{contact.name}</Text>
+                             <Text style={styles.listItemDetail}>{contact.mail}</Text>
+                         </View>
+                     </TouchableOpacity>
+                </View>
+            </Swipeout>
+          );
     }
 
     render() {
@@ -64,7 +78,7 @@ export default class EmergencyContacts extends Component {
                     dataSource={this.state.dataSource}
                     renderRow={this.renderEmergencyContact}
                 />
-                <TouchableOpacity activeOpacity={0.5} onPress={this.sampleFunction} style={styles.touchableOpacityStyle} >
+                <TouchableOpacity activeOpacity={0.5} onPress={this.add} style={styles.touchableOpacityStyle} >
                     <View style={styles.floatingButtonStyle}>
                         <Text style={styles.floatingButtonText}>+</Text>
                     </View>

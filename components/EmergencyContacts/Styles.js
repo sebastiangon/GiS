@@ -19,7 +19,7 @@ export default StyleSheet.create({
     listItem: {
         marginTop: 10,
         marginLeft: 15,
-        marginRight: 15,
+        marginRight: 25,
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
@@ -28,6 +28,9 @@ export default StyleSheet.create({
     },
     listItemDetail: {
         fontWeight: '200'
+    },
+    delete: {
+        marginTop: 5
     },
     touchableOpacityStyle:{
         position: 'absolute',
