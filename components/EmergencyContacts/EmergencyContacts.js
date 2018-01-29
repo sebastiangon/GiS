@@ -42,13 +42,15 @@ export default class EmergencyContacts extends Component {
 
     renderEmergencyContact(contact) {
         return(
-            <TouchableOpacity style={styles.listItem} activeOpacity={0.5} onPress={this.handleContactClick}>
-                <View>
-                    <Text style={styles.listItemTitle}>{contact.name}</Text>
-                    <Text style={styles.listItemDetail}>{contact.mail}</Text>
-                </View>
+            <View style={styles.listItem}>
+                <TouchableOpacity activeOpacity={0.5} onPress={this.handleContactClick}>
+                    <View>
+                        <Text style={styles.listItemTitle}>{contact.name}</Text>
+                        <Text style={styles.listItemDetail}>{contact.mail}</Text>
+                    </View>
+                </TouchableOpacity>
                 <Button title="Borrar" onPress={this.deleteContact}></Button>
-            </TouchableOpacity>
+            </View>
         );
     }
 
