@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Button, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
+import { Text, View, Button, ListView, Image, TouchableOpacity, Modal, AsyncStorage } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 
 import { assets } from '../../assets/assets';
@@ -11,7 +11,8 @@ export default class EmergencyContacts extends Component {
         const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
             dataSource: ds,
-            loaded: false
+            loaded: false,
+            adding: true
         };
         this.ds = ds;
         this.renderEmergencyContact = this.renderEmergencyContact.bind(this);
@@ -68,6 +69,31 @@ export default class EmergencyContacts extends Component {
           );
     }
 
+    closeAddModal() {
+        this.setState({ adding: false });
+    }
+
+    renderAddModal() {
+        // return(
+        //     <Modal
+        //         visible={this.state.adding}
+        //         animationType={'slide'}
+        //         onRequestClose={() => this.closeAddModal()}
+        //     >
+        //         <View style={ { flex: 1, backgroundColor: 'green' }}>
+        //             <View style={ { marginTop: 70 } }>
+        //                 <Text>This is content inside of modal component</Text>
+        //                 <Button
+        //                     onPress={() => this.closeAddModal()}
+        //                     title="Close modal"
+        //                 >
+        //                 </Button>
+        //             </View>
+        //         </View>
+        //   </Modal>
+        // );
+    }
+
     render() {
         return(
             <View style={styles.container}>
@@ -83,6 +109,7 @@ export default class EmergencyContacts extends Component {
                         <Text style={styles.floatingButtonText}>+</Text>
                     </View>
                 </TouchableOpacity>
+                { this.state.adding && this.renderAddModal() }
             </View>
         );
     }
