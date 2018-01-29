@@ -24,6 +24,57 @@ export default class EmergencyContacts extends Component {
             }, {
                 name: 'Sebastian Gonzalez',
                 mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
+            }, {
+                name: 'Sebastian Gonzalez',
+                mail: 'sebastiangon11@gmail.com'
             }])
         });
     }
@@ -47,6 +98,7 @@ export default class EmergencyContacts extends Component {
         return(
             <View style={styles.container}>
                 <Text style={styles.title}>Contactos de emergencia</Text>
+                <View style={styles.separator} />
                 <ListView
                     style={styles.list}
                     dataSource={this.state.dataSource}
