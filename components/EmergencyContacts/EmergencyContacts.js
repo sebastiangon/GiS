@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Text, View, Button, ListView, Image, TouchableOpacity, Modal, AsyncStorage } from 'react-native';
+import { Text, View, ListView, Image, TouchableOpacity, AsyncStorage } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 
+
+import ContactDetails from '../ContactDetails/ContactDetails';
 import { assets } from '../../assets/assets';
 import styles from './Styles';
 
@@ -12,21 +14,26 @@ export default class EmergencyContacts extends Component {
         this.state = {
             dataSource: ds,
             loaded: false,
-            adding: true
+            currentContact: null,
+            showDetails: true
         };
         this.ds = ds;
         this.renderEmergencyContact = this.renderEmergencyContact.bind(this);
         this.edit = this.edit.bind(this);
         this.add = this.add.bind(this);
         this.delete = this.delete.bind(this);
+        this.showDetails = this.showDetails.bind(this);
+        this.closeDetails = this.closeDetails.bind(this);
     }
 
     componentDidMount() {
         this.setState({
             dataSource: this.ds.cloneWithRows([{
+                id: 1,
                 name: 'Rocio Diaz',
                 mail: 'rociodiaz0296@gmail.com'
             }, {
+                id: 2,
                 name: 'Sebastian Gonzalez',
                 mail: 'sebastiangon11@gmail.com'
             }])
@@ -38,7 +45,7 @@ export default class EmergencyContacts extends Component {
     }
 
     add() {
-        alert(`Add Contact`);
+        this.showDetails();
     }
 
     delete(contact) {
@@ -69,29 +76,12 @@ export default class EmergencyContacts extends Component {
           );
     }
 
-    closeAddModal() {
-        this.setState({ adding: false });
+    showDetails() {
+        this.setState({ showDetails: true });
     }
 
-    renderAddModal() {
-        // return(
-        //     <Modal
-        //         visible={this.state.adding}
-        //         animationType={'slide'}
-        //         onRequestClose={() => this.closeAddModal()}
-        //     >
-        //         <View style={ { flex: 1, backgroundColor: 'green' }}>
-        //             <View style={ { marginTop: 70 } }>
-        //                 <Text>This is content inside of modal component</Text>
-        //                 <Button
-        //                     onPress={() => this.closeAddModal()}
-        //                     title="Close modal"
-        //                 >
-        //                 </Button>
-        //             </View>
-        //         </View>
-        //   </Modal>
-        // );
+    closeDetails() {
+        this.setState({ showDetails: false });
     }
 
     render() {
@@ -109,7 +99,7 @@ export default class EmergencyContacts extends Component {
                         <Text style={styles.floatingButtonText}>+</Text>
                     </View>
                 </TouchableOpacity>
-                { this.state.adding && this.renderAddModal() }
+                <ContactDetails visible={this.state.showDetails} contact={this.state.currentContact} close={this.closeDetails}/>
             </View>
         );
     }
