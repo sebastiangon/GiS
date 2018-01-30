@@ -6,7 +6,8 @@ export default StyleSheet.create({
         backgroundColor: '#efefef',
     },
     box: {
-        marginTop: 70
+        marginTop: 70,
+        alignItems: 'center',
     },
     title: {
         fontSize: 30,
@@ -25,5 +26,16 @@ export default StyleSheet.create({
     saveText: {
         color: '#fff',
         fontSize: 20,
+    },
+    input: {
+        fontSize: 20,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: '#777',
+        width: '90%',
+        marginTop: 20,
+        marginBottom: 10,
+    },
+    inputError: {
+        borderBottomColor: '#f00',
     }
 });

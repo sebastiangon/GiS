@@ -15,7 +15,7 @@ export default class EmergencyContacts extends Component {
             dataSource: ds,
             loaded: false,
             currentContact: null,
-            showDetails: true
+            showDetails: false
         };
         this.ds = ds;
         this.renderEmergencyContact = this.renderEmergencyContact.bind(this);
