@@ -9,6 +9,7 @@ export default class AddContact extends Component {
         this.state = {
             name: props.name || '',
             email: props.email || '',
+            id: props.id === null ? null : props.id,
             emailError: false,
             nameError: false
         }
@@ -36,15 +37,14 @@ export default class AddContact extends Component {
     save() {
         this.validateEmail(this.state.email);
         this.validateName(this.state.name);
-        console.log(`saving: ${this.state.mailError}`)
         if (this.state.name !== '' && this.state.email !== '' && !this.state.emailError) {
-            this.props.save();
+            this.props.save({ name: this.state.name, email: this.state.email, id: this.state.id });
         }
     }
 
     render() {
         return(
-            <Modal visible={this.props.visible} animationType={'slide'} onRequestClose={this.props.close} >
+            <Modal visible={true} animationType={'slide'} onRequestClose={this.props.close} >
                 <View style={styles.container}>
                     <View style={styles.box}>
                         <Text style={styles.title}>Detalles del contacto</Text>

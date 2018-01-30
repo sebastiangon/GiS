@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeEventEmitter, Text, View, Button, ScrollView, AppState } from 'react-native';
+import { NativeEventEmitter, Text, View, Button, ScrollView, AppState, AsyncStorage } from 'react-native';
 import * as mailService from './../mail_service/mailService';
 
 import Header from './Header/Header';
