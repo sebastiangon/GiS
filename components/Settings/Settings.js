@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 import styles from './Styles';
 
@@ -22,7 +22,11 @@ export default class Setting extends Component {
                     // onChangeText={(name) => this.validateName(name)}
                     value={this.state.name}
                 />
-                <Text style={styles.inputLabel}>Ubicacion de garage</Text>
+                <TouchableOpacity style={styles.inputLabel}>
+                    <Text>
+                        Ubicacion de garage
+                    </Text>
+                </TouchableOpacity>
             </View>
         );
     }
