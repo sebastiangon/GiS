@@ -31,7 +31,7 @@ export default class Setting extends Component {
             this.setState({ userName });
         }
         if (garageLocation) {
-            this.setState({ garageLocation });
+            this.setState({ garageLocation: JSON.parse(garageLocation) });
         }
     }
 
@@ -92,6 +92,11 @@ export default class Setting extends Component {
                 <View style={styles.garageNotSet}>
                     {!this.state.garageLocation && <Text style={styles.garageNotSetText}>No has guardado la ubicación de tu garaje</Text>}
                 </View>
+                <Text style={styles.coordinates}>
+                    {this.state.garageLocation &&
+                        `${this.state.garageLocation.coords.latitude.toString()} - ${this.state.garageLocation.coords.longitude.toString()}`
+                    }
+                </Text>
             </View>
         );
     }

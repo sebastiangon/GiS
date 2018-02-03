@@ -67,5 +67,9 @@ export default StyleSheet.create({
         position: 'absolute',
         right: 20,
         bottom: 20
+    },
+    coordinates: {
+        color: '#bbb',
+        alignSelf: 'center'
     }
 });

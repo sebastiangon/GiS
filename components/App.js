@@ -28,6 +28,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    AsyncStorage.clear();
     AppState.addEventListener('change', this.handleAppStateChange);
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
