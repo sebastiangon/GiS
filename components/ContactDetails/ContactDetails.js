@@ -49,19 +49,21 @@ export default class AddContact extends Component {
                     <View style={styles.box}>
                         <Text style={styles.title}>Detalles del contacto</Text>
 
+                        <Text style={styles.inputLabel}>Nombre completo</Text>
                         <TextInput
                             style={[styles.input, this.state.nameError ? styles.inputError : {}]}
                             autoCapitalize='words'
-                            placeholder="Nombre completo"
+                            placeholder="John Doe"
                             spellCheck={false}
                             onChangeText={(name) => this.validateName(name)}
                             value={this.state.name}
                         />
 
+                        <Text style={styles.inputLabel}>e-Mail</Text>
                         <TextInput
                             style={[styles.input, this.state.emailError ? styles.inputError : {}]}
                             autoCapitalize='none'
-                            placeholder="e-Mail"
+                            placeholder="johndoe@example.com"
                             spellCheck={false}
                             keyboardType='email-address'
                             onChangeText={(email) => this.validateEmail(email)}

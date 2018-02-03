@@ -113,7 +113,6 @@ export default class EmergencyContacts extends Component {
                 <Text style={styles.title}>Contactos de emergencia</Text>
                 <View style={styles.separator} />
                 <ListView
-                    style={styles.list}
                     dataSource={this.state.dataSource}
                     renderRow={this.renderEmergencyContact}
                 />

@@ -27,13 +27,17 @@ export default StyleSheet.create({
         color: '#fff',
         fontSize: 20,
     },
+    inputLabel: {
+        marginLeft: 20,
+        alignSelf: 'flex-start'
+    },
     input: {
         fontSize: 20,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: '#777',
         width: '90%',
-        marginTop: 20,
-        marginBottom: 10,
+        marginTop: 10,
+        marginBottom: 20,
     },
     inputError: {
         borderBottomColor: '#f00',
