@@ -15,7 +15,7 @@ export default StyleSheet.create({
         borderColor: '#aaa',
         borderWidth: StyleSheet.hairlineWidth,
         alignSelf: 'center',
-        marginBottom: 10
+        marginBottom: 15
     },
     input: {
         marginLeft: 15,
@@ -26,11 +26,46 @@ export default StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: '#777',
         width: '90%',
-        marginBottom: 20,
+        marginBottom: 15,
     },
     inputLabel: {
+        marginTop: 10,
         marginLeft: 15,
-        paddingBottom: 10,
+        paddingBottom: 5,
         alignSelf: 'flex-start',
+    },
+    garageButton: {
+        margin: 5,
+        backgroundColor: '#147bcd',
+        borderRadius: 6,
+        width: '90%',
+        alignSelf: 'center',
+        alignItems: 'center',
+        padding: 10,
+    },
+    green: {
+        backgroundColor: 'green'
+    },
+    garageButtonText: {
+        color: '#fff',
+        fontSize: 20,
+    },
+    garageNotSet: {
+        alignItems: 'center',
+    },
+    garageNotSetText: {
+        color: 'red',
+    },
+    inputError: {
+        borderBottomColor: '#f00',
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    loading: {
+        position: 'absolute',
+        right: 20,
+        bottom: 20
     }
 });
