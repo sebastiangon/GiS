@@ -11,11 +11,11 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
     separator: {
-        width: '95%',
-        borderColor: '#aaa',
+        width: '100%',
+        borderColor: '#ccc',
         borderWidth: StyleSheet.hairlineWidth,
         alignSelf: 'center',
-        marginBottom: 15
+        marginBottom: 10
     },
     input: {
         marginLeft: 15,
