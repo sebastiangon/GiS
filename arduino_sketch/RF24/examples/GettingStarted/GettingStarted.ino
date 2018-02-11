@@ -10,12 +10,12 @@
 
 /****************** User Config ***************************/
 /***      Set this radio as radio number 0 or 1         ***/
-bool radioNumber = 1;
-int ledPin = 5;
+bool radioNumber = 0;
 
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 RF24 radio(7,8);
 /**********************************************************/
+
 byte addresses[][6] = {"1Node","2Node"};
 
 // Used to control whether this node is sending or receiving
@@ -25,12 +25,12 @@ void setup() {
   Serial.begin(115200);
   Serial.println(F("RF24/examples/GettingStarted"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
-  pinMode(ledPin, OUTPUT);
+  
   radio.begin();
 
   // Set the PA Level low to prevent power supply related issues since this is a
  // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_LOW);
   
   // Open a writing and reading pipe on each radio, with opposite addresses
   if(radioNumber){
@@ -91,7 +91,7 @@ if (role == 1)  {
     }
 
     // Try again 1s later
-    delay(2000);
+    delay(1000);
   }
 
 
@@ -112,8 +112,6 @@ if (role == 1)  {
       radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
       radio.startListening();                                       // Now, resume listening so we catch the next packets.     
       Serial.print(F("Sent response "));
-      digitalWrite(ledPin, HIGH);
-      delay(1000);
       Serial.println(got_time);  
    }
  }
