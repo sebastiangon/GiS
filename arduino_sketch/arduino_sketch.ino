@@ -1,8 +1,13 @@
+#include <printf.h>
+#include <nRF24L01.h>
+#include <RF24_config.h>
+#include <RF24.h>
+
 #include <SoftwareSerial.h>
 
 SoftwareSerial BT(4,2);      // RX, TX recordar que se cruzan
 
-int enginePin = 8;
+int enginePin = 5;
 
 long lastTickMss = 0;
 long elapsedTime = 0;
