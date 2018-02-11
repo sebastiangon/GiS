@@ -1,42 +1,5 @@
-#include <SPI.h>
-#include "RF24.h"
-
-/****************** User Config ***************************/
-/***      Set this radio as radio number 0 or 1         ***/
-int engineLed = 3;
-int btLed = 5;
-int rfLed = 6;
-
-/* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
-RF24 radio(7,8);
-/**********************************************************/
-
-byte addresses[][6] = {"1Node","2Node"};
-
-void setup() {
-  Serial.begin(115200);
-  Serial.println(F("RF24/examples/GettingStarted"));
-  
-  radio.begin();
-
-  pinMode(engineLed,OUTPUT);
-  pinMode(btLed,OUTPUT);
-  pinMode(rfLed,OUTPUT);
-  // Set the PA Level low to prevent power supply related issues since this is a
- // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
-  radio.setPALevel(RF24_PA_MIN);
-  radio.openWritingPipe(addresses[1]);
-  radio.openReadingPipe(1,addresses[0]);
-  
-  // Start the radio listening for data
-  radio.startListening();
-}
-
-void loop() {
-  digitalWrite(engineLed, HIGH);
-  digitalWrite(rfLed, HIGH);
-  digitalWrite(btLed, HIGH);
-  /***************** Ping Out Role ****************/
+bool execRadio() {
+   /***************** Ping Out Role ****************/
   radio.stopListening();                                    // First, stop listening so we can talk.
   
   Serial.println(F("Now sending"));
@@ -74,8 +37,4 @@ void loop() {
       Serial.print(end_time-start_time);
       Serial.println(F(" microseconds"));
   }
-
-  // Try again 1s later
-  delay(1000);
-} // Loop
-
+}
