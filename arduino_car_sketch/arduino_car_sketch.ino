@@ -15,7 +15,6 @@ bool BTConnected = false;
 bool RFConnected = false;
 long BTFirstConnectionMillis = 0; //  Bluetooth first connection milliseconds
 long RFFirstConnectionMillis = 0; //  Radio first pong received milliseconds
-String BTJsonResponse = ""  //  The response that will be sent to the phone informing the connections state
 
 byte addresses[][6] = {"1Node","2Node"};
 

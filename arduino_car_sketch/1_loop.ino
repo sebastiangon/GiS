@@ -8,9 +8,6 @@ void loop() {
 
   execTimedRutines(); //  Timed events (reconnections, searching timeouts, etc)
 
-  //  Reset connection flags for next loop
-  BTConnected = false;
-  RFConnected = false;
   delay(1000);
 }
 

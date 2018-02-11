@@ -1,4 +1,7 @@
 void execRadio() {
+
+  RFConnected = false;
+  
   /***************** Ping Out Role ****************/
   radio.stopListening();                                    // First, stop listening so we can talk.
   
@@ -36,5 +39,7 @@ unsigned long start_time = micros();                        // Take the time, an
       Serial.print(F(", Round-trip delay "));
       Serial.print(end_time-start_time);
       Serial.println(F(" microseconds"));
+
+      RFConnected = true;
   }
 }

@@ -1,4 +1,6 @@
 void execBluetooth() {
+
+  BTConnected = false;
   
   while (BT.available()) {
     
@@ -11,9 +13,16 @@ void execBluetooth() {
   }
   
   if (BTConnected) {
-    //Build response JSON
+
+    String lostGagareConnection = lostGarageConnection() ? "true" : "false";
+    String garageConnected = RFConnected ? "true" : "false";
+
+    Serial.write("lostGarageConnectin = " + lostGagareConnection);
+    Serial.write("garageConnected = " + garageConnected);
+
+    String jsonResponse = "{}";
     
-    BT.write("pong"); Serial.write("\npong sent\n");
+    BT.write(jsonResponse); Serial.write(jsonResponse);
   }
   
 }
