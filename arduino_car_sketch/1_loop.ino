@@ -1,18 +1,15 @@
 void loop() {
-  digitalWrite(engineLed, HIGH);
-  digitalWrite(RFLed, HIGH);
-  digitalWrite(BTLed, HIGH);
-  delay(1000);
-  digitalWrite(engineLed, LOW);
-  digitalWrite(RFLed, LOW);
-  digitalWrite(BTLed, LOW);
-  delay(1000);
+  BTConnected = false;
+  RFConnected = false;
 
   execBluetooth();
 
-  execRadio();
+  if (BTConnected) {
+    execRadio();
+  }
 
-  // Try again 1s later
+  execTimedRutines();
+
   delay(1000);
 }
 

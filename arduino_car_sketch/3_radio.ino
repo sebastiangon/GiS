@@ -1,10 +1,10 @@
-bool execRadio() {
-   /***************** Ping Out Role ****************/
+void execRadio() {
+  /***************** Ping Out Role ****************/
   radio.stopListening();                                    // First, stop listening so we can talk.
   
   Serial.println(F("Now sending"));
 
-  unsigned long start_time = micros();                             // Take the time, and send it.  This will block until complete
+unsigned long start_time = micros();                        // Take the time, and send it.  This will block until complete
    if (!radio.write( &start_time, sizeof(unsigned long) )){
      Serial.println(F("failed"));
    }

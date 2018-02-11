@@ -13,8 +13,9 @@ int RFLed = 6;      //  Green led
 
 bool BTConnected = false;
 bool RFConnected = false;
-long BTConnectionStartMillis = 0; //  Bluetooth first connection milliseconds
-long RFConnectionStartMillis = 0; //  Radio first pong received milliseconds
+long BTFirstConnectionMillis = 0; //  Bluetooth first connection milliseconds
+long RFFirstConnectionMillis = 0; //  Radio first pong received milliseconds
+String BTJsonResponse = ""  //  The response that will be sent to the phone informing the connections state
 
 byte addresses[][6] = {"1Node","2Node"};
 
@@ -22,6 +23,8 @@ void setup() {
   pinMode(engineLed,OUTPUT);
   pinMode(BTLed,OUTPUT);
   pinMode(RFLed,OUTPUT);
+
+  digitalWrite(engineLed,HIGH);
 
   BT.begin(9600);
 
@@ -31,9 +34,6 @@ void setup() {
   radio.openReadingPipe(1,addresses[0]);
   radio.startListening();
 
-//  Bluetooth Serial
-//  Serial.begin(9600);
-//  RF Serial
   Serial.begin(115200);
 }
 

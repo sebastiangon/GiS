@@ -32,7 +32,7 @@ export default class App extends Component {
     AppState.addEventListener('change', this.handleAppStateChange);
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
-    // this.bluetooth.init();
+    this.bluetooth.init();
     notiService.init(this.onPushNotification.bind(this));
   }
 
