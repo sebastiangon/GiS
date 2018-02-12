@@ -12,12 +12,18 @@ export default StyleSheet.create({
         width: '90%',
         alignSelf: 'center',
         alignItems: 'center',
-        padding: 10,
+        padding: 15,
+    },
+    landingBtnText: {
+        color: 'white',
     },
     image: {
         width: 100,
         height: 100,
         marginLeft: 5,
+    },
+    dot8: {
+        opacity: .8
     },
     connectionIndicators: {
         margin: 20,
@@ -26,12 +32,18 @@ export default StyleSheet.create({
         alignItems: 'center',
     },
     imageFrame: {
-        width: 100,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 150,
+        height: 150,
         margin: 20,
+        backgroundColor: 'rgba(255, 255, 255, .4)',
+        borderRadius: 15,
     },
     loading: {
         position: 'absolute',
-        top: 37,
-        left: 37
+        top: 60,
+        left: 60
     }
 });

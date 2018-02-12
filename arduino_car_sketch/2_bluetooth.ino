@@ -22,7 +22,7 @@ void execBluetooth() {
     
     garageSearchTimeout = false; //  Once sent, reset it 
 
-//    Serial.println(jsonResponse);
+    Serial.println(jsonResponse);
 
     for (int i = 0; i < jsonResponse.length(); i++) {
       BT.write(jsonResponse[i]);

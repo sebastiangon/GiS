@@ -3,7 +3,7 @@ import BleManager from 'react-native-ble-manager';
 import { stringToBytes, bytesToString } from 'convert-string';
 
 import * as BTConfig from './bluetooth.config';
-import { carConnectionStatusEnum } from '../carConnectionStatusEnum';
+import { connectionStatusEnum } from '../connectionStatusEnum';
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -71,7 +71,7 @@ export class Bluetooth {
     startScan(carPeripheralId, scanTimeout) {
         if (!this.scanning) {
             this.peripheral = null;
-            this.dispatchListener('connectionStatusChange', {carConnectionStatus: carConnectionStatusEnum.CONNECTING});
+            this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.CONNECTING});
             BleManager.scan([], scanTimeout, true).then((results) => {
                 console.log(`Bluetooth: Searching car...`);
                 this.scanning = true;
@@ -87,8 +87,8 @@ export class Bluetooth {
         } else {
             this.propmtTurnOnBluetoothId = setInterval(() => {
                 // TODO reemplazar por un mensaje en UI
-                // Alert.alert('Error', 'El bluetooth se encuentra desactivado. Vaya a Ajustes --> Bluetooth para activarlo');
-            }, 5000);
+                Alert.alert('Error', 'El bluetooth se encuentra desactivado. Vaya a Ajustes --> Bluetooth para activarlo');
+            }, 15000);
         }
     }
 
@@ -114,7 +114,7 @@ export class Bluetooth {
             clearInterval(this.lostConnectionIntervalId);
             //this.sendMessageToPeripheral(this.peripheral); 
             console.log(`Bluetooth: Connected to ${peripheral.id}`);
-            this.dispatchListener('connectionStatusChange', {carConnectionStatus: carConnectionStatusEnum.CONNECTED});
+            this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.CONNECTED});
         }
         catch(e) {
             console.warn(`Bluetooth: Error sync bluetooth - ${e.message}`);

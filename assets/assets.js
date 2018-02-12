@@ -6,5 +6,7 @@ export const assets = {
     user : require('./user.png'),
     cogs : require('./cogs.png'),
     home: require('./home.png'),
+    homeCross: require('./home-cross.png'),
+    homeCheck: require('./home-check.png'),
     trash: require('./trash-o.png')
 };
