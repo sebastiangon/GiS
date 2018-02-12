@@ -50,7 +50,7 @@ export default class App extends Component {
   }
 
   onUpdateValueForCharacteristic(data) {
-    console.log(` onUpdateValueForCharacteristic: lostGarageConnection - ${data.lostGarageConnection} garageConnected - ${data.garageConnected} garageSearchTimeout - ${data.garageSearchTimeout}`);
+    console.log(`onUpdateValueForCharacteristic: lostGarageConnection - ${data.lostGarageConnection} garageConnected - ${data.garageConnected} garageSearchTimeout - ${data.garageSearchTimeout}`);
   }
 
   onPushNotification(noti) {
@@ -83,7 +83,7 @@ export default class App extends Component {
         return <EmergencyContacts />;
         break;
       case(appTabsEnum.LANDING):
-        return <Landing />;
+        return <Landing carConnectionStatus={this.state.carConnectionStatus} />;
         break;
       case(appTabsEnum.SETTINGS):
         return <Settings />;
@@ -96,7 +96,7 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Header carConnectionStatus={this.state.carConnectionStatus} />
+        <Header />
         <View style={styles.activeTabContainer}>
           {this.renderTab(this.state.activeTab)}
         </View>

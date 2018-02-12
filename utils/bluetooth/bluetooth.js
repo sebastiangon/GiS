@@ -86,8 +86,8 @@ export class Bluetooth {
             this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
         } else {
             this.propmtTurnOnBluetoothId = setInterval(() => {
-                // TO DO reemplazar por un mensaje en UI
-                Alert.alert('Error', 'El bluetooth se encuentra desactivado. Vaya a Ajustes --> Bluetooth para activarlo');
+                // TODO reemplazar por un mensaje en UI
+                // Alert.alert('Error', 'El bluetooth se encuentra desactivado. Vaya a Ajustes --> Bluetooth para activarlo');
             }, 5000);
         }
     }

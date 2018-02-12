@@ -78,7 +78,6 @@ export default class Setting extends Component {
                         <Text style={styles.inputLabel}>Nombre completo</Text>
                         <View style={styles.row}>
                             <TextInput
-                                autoFocus={true}
                                 style={[styles.input, this.state.nameError ? styles.inputError : {}]}
                                 autoCapitalize='words'
                                 placeholder="Ingresa tu nombre"

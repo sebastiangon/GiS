@@ -18,5 +18,10 @@ export default StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    headerTitle: {
+        fontSize: 30,
+        margin: 10,
+        fontWeight: '600',
     }
 });
