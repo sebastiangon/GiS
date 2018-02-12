@@ -17,6 +17,7 @@ export class Bluetooth {
         this.eventListeners = {};
         this.propmtTurnOnBluetoothId = 0;
         this.showingAlert = false;
+        this.characteristicValueBuffer = '';
 
         //Method binding
         this.init = this.init.bind(this);
@@ -111,23 +112,23 @@ export class Bluetooth {
             };
             this.lostConnectionSeconds = 0;
             clearInterval(this.lostConnectionIntervalId);
-            this.sendMessageToPeripheral(this.peripheral); 
+            //this.sendMessageToPeripheral(this.peripheral); 
             console.log(`Bluetooth: Connected to ${peripheral.id}`);
             this.dispatchListener('connectionStatusChange', {carConnectionStatus: carConnectionStatusEnum.CONNECTED});
         }
         catch(e) {
-            console.log(`Bluetooth: Error sync bluetooth - ${e.message}`);
+            console.warn(`Bluetooth: Error sync bluetooth - ${e.message}`);
         }
     }
 
-    async sendMessageToPeripheral(peripheral) {
-        await BleManager.retrieveServices(peripheral.id);
+    async sendMessageToPeripheral(message) {
+        await BleManager.retrieveServices(this.peripheral.id);
         setTimeout(async () => {
-            await BleManager.startNotification(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
-            console.log(`Bluetooth: started notification on ${peripheral.id}`);
+            await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
+            console.log(`Bluetooth: started notification on ${this.peripheral.id}`);
             setTimeout(async () => {
-                await BleManager.write(peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes('APP - send ping'));
-                console.log(`Bluetooth: APP - send ping`);         
+                await BleManager.write(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes(message));
+                console.log(`Bluetooth: SentMessageToPeripheral - ${message}`);
             }, 500);
         }, 300);
     }
@@ -143,8 +144,20 @@ export class Bluetooth {
     }
 
     handleUpdateValueForCharacteristic(data) {
-        const value = bytesToString(data.value);
-        console.log(`Bluetooth: ${value}`);
+        try {
+            const value = bytesToString(data.value);
+            if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
+                const valueSplit = value.split('>');
+                this.characteristicValueBuffer += valueSplit[0];
+                const responseJson = JSON.parse(this.characteristicValueBuffer);
+                this.dispatchListener('updateValueForCharacteristic', responseJson);
+                this.characteristicValueBuffer = valueSplit[1]; // Set the buffer with the surplus part of the incoming value (after the >)...
+            } else {
+                this.characteristicValueBuffer += value;
+            }
+        } catch (error) {
+            console.warn(`Bluetooth: handleUpdateValueForCharacteristic error: ${error.message}`);
+        }
     }
 
     removeListeners() {

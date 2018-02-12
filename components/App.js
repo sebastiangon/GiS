@@ -7,6 +7,7 @@ import TabBar from './TabBar/TabBar';
 import Landing from './Landing/Landing';
 import EmergencyContacts from './EmergencyContacts/EmergencyContacts';
 import Settings from './Settings/Settings';
+import { carConnectionStatusEnum } from '../utils/carConnectionStatusEnum';
 
 import * as notiService from '../utils/notificationService';
 import { Bluetooth } from '../utils/bluetooth/bluetooth';
@@ -19,11 +20,13 @@ export default class App extends Component {
     super();
     this.state = {
       carConnectionStatus: false,
-      activeTab: appTabsEnum.SETTINGS
+      activeTab: appTabsEnum.LANDING
     };
     this.bluetooth = null;
+    this.checkCarConnectionsIntervalId = null;
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
     this.onBluetoothConectionStateChange = this.onBluetoothConectionStateChange.bind(this);
+    this.onUpdateValueForCharacteristic = this.onUpdateValueForCharacteristic.bind(this);
     this.setActiveTab = this.setActiveTab.bind(this);
   }
 
@@ -32,12 +35,22 @@ export default class App extends Component {
     AppState.addEventListener('change', this.handleAppStateChange);
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
+    this.bluetooth.addListener('updateValueForCharacteristic', this.onUpdateValueForCharacteristic);
     this.bluetooth.init();
     notiService.init(this.onPushNotification.bind(this));
   }
 
   onBluetoothConectionStateChange(data) {
     this.setState({ carConnectionStatus: data.carConnectionStatus });
+    if (data.carConnectionStatus === carConnectionStatusEnum.CONNECTED) {
+      this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, 3000);
+    } else {
+      clearInterval(this.checkCarConnectionsIntervalId);
+    }
+  }
+
+  onUpdateValueForCharacteristic(data) {
+    console.log(` onUpdateValueForCharacteristic: lostGarageConnection - ${data.lostGarageConnection} garageConnected - ${data.garageConnected} garageSearchTimeout - ${data.garageSearchTimeout}`);
   }
 
   onPushNotification(noti) {

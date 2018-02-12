@@ -2,7 +2,7 @@ void loop() {
   
   execBluetooth();    //  Look for mobile app messages
 
-  if (BTConnected) {  //  Start looking a garage if the bluetooth is connected
+  if (BTFirstConnectionMillis) {  //  Start looking a garage if the bluetooth is has connected at least once
     execRadio();
   }
 

@@ -14,15 +14,16 @@ void execBluetooth() {
   
   if (BTConnected) {
 
-    String lostGagareConnection = lostGarageConnection() ? "true" : "false";
-    String garageConnected = RFConnected ? "true" : "false";
-
-    Serial.write("lostGarageConnectin = " + lostGagareConnection);
-    Serial.write("garageConnected = " + garageConnected);
-
-    String jsonResponse = "{}";
+    String lostGarageConnectionStr = (RFFirstConnectionMillis > 0 && !RFConnected) ? "true" : "false";
+    String garageConnectedStr = RFConnected ? "true" : "false";
+    String garageSearchTimeoutStr = garageSearchTimeout ? "true" : "false";
+    String jsonResponse = "{ \"lostGarageConnection\":" + lostGarageConnectionStr + ",\"garageConnected\":" + garageConnectedStr + ",\"garageSearchTimeout\":" + garageSearchTimeoutStr + "}" + ">"; //  DONT REMOVE THE >, ITS THE EOS CHARACTER
+    garageSearchTimeout = false; //  Once sent, reset it
+    Serial.println(jsonResponse);
     
-    BT.write(jsonResponse); Serial.write(jsonResponse);
+    for (int i = 0; i < jsonResponse.length(); i++) {
+      BT.write(jsonResponse[i]);
+    }
   }
   
 }
