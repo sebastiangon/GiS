@@ -20,7 +20,7 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      activeTab: appTabsEnum.SETTINGS,
+      activeTab: appTabsEnum.LANDING,
       carConnectionStatus: connectionStatusEnum.STOPPED,
       garageConnectionStatus: connectionStatusEnum.STOPPED,
       startSequenceEnabled: true,
@@ -98,6 +98,7 @@ export default class App extends Component {
   }
 
   onCodeAsserted() {
+    console.log(`propmt`);
     this.setState({ promptSecurityCode: false });
     Alert.alert('Code asserted');
   }
@@ -149,16 +150,19 @@ export default class App extends Component {
   }
   
   render() {
-    return (
-      <View style={styles.container}>
-        <Header />
-        <View style={styles.activeTabContainer}>
-          {this.renderTab(this.state.activeTab)}
+    if (this.state.promptSecurityCode) {
+      return (<SecurityCode codeAsserted={this.onCodeAsserted}/>);
+    } else {
+      return (
+        <View style={styles.container}>
+          <Header />
+          <View style={styles.activeTabContainer}>
+            {this.renderTab(this.state.activeTab)}
+          </View>
+          <TabBar onTabSelected={this.setActiveTab} activeTab={this.state.activeTab} />
         </View>
-        <TabBar onTabSelected={this.setActiveTab} activeTab={this.state.activeTab} />
-        <SecurityCode visible={this.state.promptSecurityCode} codeAsserted={this.onCodeAsserted}/>
-      </View>
-    );
+      );
+    }
   }
 }
 

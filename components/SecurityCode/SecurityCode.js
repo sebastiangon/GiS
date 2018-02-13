@@ -39,7 +39,7 @@ export default class SecurityCode extends Component {
 
     render() {
         return(
-            <Modal visible={this.props.visible} animationType={'slide'} onRequestClose={this.props.close} >
+            <View animationType={'slide'} onRequestClose={this.props.close} >
                 <View style={styles.container}>
                     <View style={styles.box}>
                         <Text style={styles.title}>Código de seguridad</Text>
@@ -62,7 +62,7 @@ export default class SecurityCode extends Component {
                         </TouchableOpacity>                        
                     </View>
                 </View>
-          </Modal>
+          </View>
         );
     }
 }
