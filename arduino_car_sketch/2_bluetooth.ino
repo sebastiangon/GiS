@@ -1,11 +1,18 @@
 void execBluetooth() {
 
   BTConnected = false;
+
+  if (BTLastConnectionMillis > 0 && BTLastDisconnectionMillis == 0) {
+    BTLastDisconnectionMillis = millis(); //take note of the disconnection time, if it doesnt connect again afer timeout, stop engine.
+  }
+  digitalWrite(BTLed,LOW);
   
   while (BT.available()) {
     
      Serial.write(BT.read());
      BTConnected = true;
+     BTLastDisconnectionMillis = 0; //  Remove the last disconnection time
+     digitalWrite(BTLed,HIGH);
      
      if (BTLastConnectionMillis == 0) {
         BTLastConnectionMillis = millis(); //  If its the first time connecting, set firstConnectinoMillis

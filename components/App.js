@@ -25,6 +25,7 @@ export default class App extends Component {
       startSequenceEnabled: true
     };
     this.lostGarageConnectionFired = false;
+    this.garageSearchTimeoutFired = false;
     this.bluetooth = null;
     this.checkCarConnectionsIntervalId = null;
     this.onBluetoothConectionStateChange = this.onBluetoothConectionStateChange.bind(this);
@@ -57,17 +58,21 @@ export default class App extends Component {
   onUpdateValueForCharacteristic(data) {
       if (data.garageConnected) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
+          this.lostGarageConnectionFired = false;
+          this.garageSearchTimeoutFired = false;
       }
       if (data.lostGarageConnection) {
-          //  Fired after all the retries set in arduino sketch
+          //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
           this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
           if (!this.lostGarageConnectionFired) {
             this.lostGarageConnectionFired = true;
-            this.pushNotif('Intoduce el código');
-            Alert.alert('SECUESTRO !!!!!!!! o te fuiste man');
+            this.pushNotif('Introduce tu código');
+            Alert.alert('Aca se muestra el ingreso de código');
           }
       }
       if (data.garageSearchTimeout) {
+        if (!this.garageSearchTimeoutFired) {
+          this.garageSearchTimeoutFired = true;
           this.pushNotif('¿Todavía estas en camino a casa ?');
           Alert.alert(
             'Hey !',
@@ -78,6 +83,7 @@ export default class App extends Component {
             ],
             { cancelable: false }
           )
+        }
       }
   }
 
@@ -93,9 +99,7 @@ export default class App extends Component {
   }
 
   pushNotif(message) {
-    if(appState === 'background') {
-      notiService.scheduleNotification(message, new Date(Date.now()));
-    }
+    notiService.scheduleNotification(message, new Date(Date.now()));
   }
 
   // handleAppStateChange(appState) {

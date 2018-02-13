@@ -1,6 +1,7 @@
 void execRadio() {
 
   RFConnected = false;
+  digitalWrite(RFLed,LOW);
   
   /***************** Ping Out Role ****************/
   radio.stopListening();                                    // First, stop listening so we can talk.
@@ -44,6 +45,7 @@ unsigned long start_time = micros();                        // Take the time, an
       Serial.println(F(" microseconds"));
 
       if (got_time != 0) {
+        digitalWrite(RFLed,HIGH);
         RFConnected = true; //  Making contact with garage
         RFretryCount = 0;   // Reset retry count
 

@@ -1,10 +1,10 @@
 int oneSecond = 1000;
 int oneMinute = 60000;
 
-long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout
+long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout --> 300000 ms
 long garageSearchTimeoutLastMeasurement = 0;  //  Last time that garageSearch did timout
 
-
+long bluetoothDisconnectionMaxTime = 10000;
 
 void execTimedRutines() {
   
@@ -12,8 +12,13 @@ void execTimedRutines() {
   
   if ( (elapsedTime - garageSearchTimeoutLastMeasurement) >= garageSearchTimeoutPeriod ) {
     garageSearchTimeoutLastMeasurement = elapsedTime;
-    garageSearchTimeout = true;
+    if (!RFConnected) {
+      garageSearchTimeout = true;
+    }
   }
-  
+
+  if ( !BTConnected && BTLastDisconnectionMillis != 0 && ((elapsedTime - BTLastDisconnectionMillis) >=  bluetoothDisconnectionMaxTime)) {
+    digitalWrite(engineLed,LOW); // Turn off engine, car stolen
+  }
 }
 

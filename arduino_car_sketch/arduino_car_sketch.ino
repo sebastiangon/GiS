@@ -15,6 +15,7 @@ bool BTConnected = false;
 bool RFConnected = false;
 bool garageSearchTimeout = false;
 long BTLastConnectionMillis = 0; //  Bluetooth first connection milliseconds
+long BTLastDisconnectionMillis = 0; //  Bluetooth first connection milliseconds
 long RFLastConnectionMillis = 0; //  Radio first pong received milliseconds
 int RFretryCount = 0;
 int RFMaxRetries = 15;
