@@ -19,27 +19,20 @@ export default class EmergencyContacts extends Component {
             showDetails: false
         };
         this.ds = ds;
-        this.renderEmergencyContact = this.renderEmergencyContact.bind(this);
-        this.save = this.save.bind(this);
-        this.edit = this.edit.bind(this);
-        this.delete = this.delete.bind(this);
-        this.showDetails = this.showDetails.bind(this);
-        this.closeDetails = this.closeDetails.bind(this);
-        this.loadContacts = this.loadContacts.bind(this);
     }
 
     componentDidMount() {
         this.loadContacts();
     }
 
-    async loadContacts() {
+    loadContacts = async () => {
         const emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
         if (emergencyContacts) {
             this.setState({ dataSource: this.ds.cloneWithRows( JSON.parse(emergencyContacts) ) });
         }
     }
 
-    async save(contact) {
+    save = async (contact) => {
         try {
             let emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
             emergencyContacts = emergencyContacts ? JSON.parse(emergencyContacts) : [];
@@ -62,12 +55,12 @@ export default class EmergencyContacts extends Component {
         }
     }
 
-    edit(currentContact) {
+    edit = (currentContact) => {
         this.setState({ currentContact });
         this.showDetails();
     }
 
-    async delete(contact) {
+    delete = async (contact) => {
         let emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
             emergencyContacts = emergencyContacts ? JSON.parse(emergencyContacts) : [];
             emergencyContacts = emergencyContacts.filter((cont) => cont.id !== contact.id);
@@ -75,7 +68,7 @@ export default class EmergencyContacts extends Component {
             await this.loadContacts();
     }
 
-    renderEmergencyContact(contact) {
+    renderEmergencyContact = (contact) => {
         let swipeBtns = [{
             text: 'Delete',
             backgroundColor: 'red',
@@ -99,11 +92,11 @@ export default class EmergencyContacts extends Component {
           );
     }
 
-    showDetails() {
+    showDetails = () => {
         this.setState({ showDetails: true });
     }
 
-    closeDetails() {
+    closeDetails = () => {
         this.setState({ showDetails: false });
     }
 

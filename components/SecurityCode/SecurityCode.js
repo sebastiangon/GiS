@@ -11,27 +11,24 @@ export default class SecurityCode extends Component {
             securityCode: null,
             typedSecurityCode: null,
         }
-        this.loadData = this.loadData.bind(this);
-        this.assertCode = this.assertCode.bind(this);
-        this.onType = this.onType.bind(this);
     }
 
     componentDidMount() {
         this.loadData();
     }
 
-    async loadData() {
+    loadData = async () => {
         const securityCode = await AsyncStorage.getItem(storage.SECURITY_CODE);
         if (securityCode) {
             this.setState({ securityCode });
         }
     }
 
-    onType(typedSecurityCode) {
+    onType = (typedSecurityCode) => {
         this.setState({ typedSecurityCode });
     }
 
-    assertCode() {
+    assertCode = () => {
         if (this.state.securityCode === this.state.typedSecurityCode) {
             this.props.codeAsserted();
         }

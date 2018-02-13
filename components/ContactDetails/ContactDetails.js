@@ -13,10 +13,9 @@ export default class AddContact extends Component {
             emailError: false,
             nameError: false
         }
-        this.save = this.save.bind(this);
     }
 
-    validateEmail(email) {
+    validateEmail = (email) => {
         const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(email)){
             this.setState({ emailError: false, email });
@@ -26,7 +25,7 @@ export default class AddContact extends Component {
         }
     }
 
-    validateName(name) {
+    validateName = (name) => {
         if (name === '') {
             this.setState({ nameError: true, name });
         } else {
@@ -34,7 +33,7 @@ export default class AddContact extends Component {
         }
     }
 
-    save() {
+    save = () => {
         this.validateEmail(this.state.email);
         this.validateName(this.state.name);
         if (this.state.name !== '' && this.state.email !== '' && !this.state.emailError) {

@@ -9,13 +9,9 @@ export default class Landing extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-
-        //Local methods
-        this.getCarIconSource = this.getCarIconSource.bind(this);
-        this.getHouseIconSource = this.getHouseIconSource.bind(this);
     }
 
-    getCarIconSource() {
+    getCarIconSource = () => {
         switch(this.props.carConnectionStatus) {
             case connectionStatusEnum.STOPPED:
                 return assets.carCross;
@@ -28,7 +24,7 @@ export default class Landing extends Component {
         }
     }
 
-    getHouseIconSource() {
+    getHouseIconSource = () => {
         switch(this.props.garageConnectionStatus) {
             case connectionStatusEnum.STOPPED:
                 return assets.homeCross;

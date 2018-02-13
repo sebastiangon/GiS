@@ -16,18 +16,13 @@ export default class Setting extends Component {
             codeError: false,
             verificationCodeError: false,
         };
-        this.save = this.save.bind(this);
-        this.validateName = this.validateName.bind(this);
-        this.validateCode = this.validateCode.bind(this);
-        this.validateConfirmationCode = this.validateConfirmationCode.bind(this);
-        this.setGarage = this.setGarage.bind(this);
     }
 
     componentDidMount() {
         this.loadUserData();
     }
 
-    async loadUserData() {
+    loadUserData = async () => {
         const userName = await AsyncStorage.getItem(storage.USER_NAME);
         const garageLocation = await AsyncStorage.getItem(storage.GARAGE_LOCATION);
         const securityCode = await AsyncStorage.getItem(storage.SECURITY_CODE);
@@ -42,7 +37,7 @@ export default class Setting extends Component {
         }
     }
 
-    setGarage() {
+    setGarage = () => {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                const garageLocation = JSON.parse(JSON.stringify(position));
@@ -56,7 +51,7 @@ export default class Setting extends Component {
          );
      }
 
-     validateName(userName) {
+     validateName = (userName) => {
         if (userName === '') {
             this.setState({ nameError: true, userName });
         } else {
@@ -64,7 +59,7 @@ export default class Setting extends Component {
         }
     }
 
-    validateCode(securityCode) {
+    validateCode = (securityCode) => {
         if (securityCode.length !== 4) {
             this.setState({ codeError: true, securityCode });
         } else {
@@ -73,7 +68,7 @@ export default class Setting extends Component {
         this.validateConfirmationCode(this.state.verificationCode);
     }
 
-    validateConfirmationCode(verificationCode) {
+    validateConfirmationCode = (verificationCode) => {
         if (verificationCode !== this.state.securityCode) {
             this.setState({ verificationCodeError: true, verificationCode });
         } else {
@@ -81,7 +76,7 @@ export default class Setting extends Component {
         }
     }
 
-    async save() {
+    save = async () => {
         Keyboard.dismiss();
         if (!this.state.nameError && !this.state.codeError && !this.state.verificationCodeError) {
             await AsyncStorage.setItem(storage.USER_NAME, this.state.userName);
