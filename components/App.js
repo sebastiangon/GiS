@@ -34,16 +34,6 @@ export default class App extends Component {
     this.garageSearchTimeoutFired = false;
     this.bluetooth = null;
     this.checkCarConnectionsIntervalId = null;
-    this.onBluetoothConectionStateChange = this.onBluetoothConectionStateChange.bind(this);
-    this.onUpdateValueForCharacteristic = this.onUpdateValueForCharacteristic.bind(this);
-
-    this.setActiveTab = this.setActiveTab.bind(this);
-    // this.handleAppStateChange = this.handleAppStateChange.bind(this);
-    this.startSequence = this.startSequence.bind(this);
-    this.onCodeAsserted = this.onCodeAsserted.bind(this);
-    this.startEmergencyCountdown = this.startEmergencyCountdown.bind(this);
-    this.stopEmergencyCountdown = this.stopEmergencyCountdown.bind(this);
-    this.emergencyMail = this.emergencyMail.bind(this);
   }
 
   componentDidMount() {
@@ -55,7 +45,7 @@ export default class App extends Component {
     notiService.init(this.onPushNotification.bind(this));
   }
 
-  onBluetoothConectionStateChange(data) {
+  onBluetoothConectionStateChange = (data) => {
       this.setState({ carConnectionStatus: data.carConnectionStatus });
       if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
@@ -65,7 +55,7 @@ export default class App extends Component {
       }
   }
 
-  onUpdateValueForCharacteristic(data) {
+  onUpdateValueForCharacteristic = (data) => {
       if (data.garageConnected) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
           this.lostGarageConnectionFired = false;
@@ -98,55 +88,55 @@ export default class App extends Component {
       }
   }
 
-  startEmergencyCountdown() {
+  startEmergencyCountdown = () => {
     this.state.emergencySecondsElapsed = 0;
     clearInterval(this.securityCodeCountdownId);
     this.securityCodeCountdownId = setInterval(this.emergencyMail, 1000);
     this.setState({ promptSecurityCode: true });
   }
 
-  stopEmergencyCountdown() {
+  stopEmergencyCountdown = () => {
     this.state.emergencySecondsElapsed = 0;
     clearInterval(this.securityCodeCountdownId);
     this.setState({ promptSecurityCode: false });
   }
 
-  emergencyMail() {
+  emergencyMail = () => {
     this.setState({ emergencySecondsElapsed: this.state.emergencySecondsElapsed += 1 });
     if (this.state.emergencySecondsElapsed >= SECURITY_CODE_TIMEOUT) {
-      Alert.alert('sendingMails');
+      this.
       this.stopEmergencyCountdown();
     }
   }
 
-  startSequence() {
+  startSequence = () => {
       if (this.state.startSequenceEnabled) {
           this.bluetooth.init();
           this.setState({ startSequenceEnabled: false });
       }
   }
 
-  onCodeAsserted() {
+  onCodeAsserted = () => {
     console.log(`propmt`);
     this.setState({ promptSecurityCode: false });
     Alert.alert('Code asserted');
   }
 
-  onPushNotification(noti) {
+  onPushNotification = (noti) => {
     console.log(`onPushNotification touched ${JSON.stringify(noti)}`);
   }
 
-  pushNotif(message) {
+  pushNotif = (message) => {
     notiService.scheduleNotification(message, new Date(Date.now()));
   }
 
-  // handleAppStateChange(appState) {
+  // handleAppStateChange = (appState) => {
   //   if(appState === 'background') {
   //     notiService.scheduleNotification('${NotificationMessage}', new Date(Date.now() + (3 * 1000)));
   //   }
   // }
 
-  async handleSendMail() {
+  handleSendMail = async () => {
     const emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
     const userName = await AsyncStorage.getItem(storage.USER_NAME);
     if (emergencyContacts && userName) {
@@ -157,11 +147,11 @@ export default class App extends Component {
     // const mailList = [{ to: { name: 'NOMBRE CONTACTO EMERGENCIA', mail: 'sebastiangon11@gmail.com' }, from: { name: 'NOMBRE DEL USER DE APP' } } ];
   }
 
-  setActiveTab(activeTab) {
+  setActiveTab = (activeTab) => {
     this.setState({ activeTab });
   }
 
-  renderTab(tab) {
+  renderTab = (tab) => {
     switch(tab){
       case(appTabsEnum.EMERGENCY_CONTACTS):
         return <EmergencyContacts />;

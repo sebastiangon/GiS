@@ -19,18 +19,6 @@ export class Bluetooth {
         this.showingAlert = false;
         this.characteristicValueBuffer = '';
 
-        //Method binding
-        this.init = this.init.bind(this);
-        this.addListener = this.addListener.bind(this);
-        this.dispatchListener = this.dispatchListener.bind(this);
-        this.startScan = this.startScan.bind(this);
-        this.startSync = this.startSync.bind(this);
-        this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
-        this.handleStopScan = this.handleStopScan.bind(this);
-        this.handleDisconnectedPeripheral = this.handleDisconnectedPeripheral.bind(this);
-        this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
-        this.handleBLEUpdateState = this.handleBLEUpdateState.bind(this);
-
         //BleManagerEmitter callbacks
         this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',this.handleDiscoverPeripheral );
         this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
@@ -39,18 +27,18 @@ export class Bluetooth {
         this.updateState = bleManagerEmitter.addListener('BleManagerDidUpdateState', this.handleBLEUpdateState);
     }
 
-    init() {
+    init = () => {
         BleManager.start({showAlert: false})
         .then(() => {
             console.log('Bluetooth: Module initialized');
         });
     }
 
-    addListener(evt, cb) {
+    addListener = (evt, cb) => {
         this.eventListeners[evt] = cb;
     }
     
-    handleDiscoverPeripheral(peripheral) {
+    handleDiscoverPeripheral = (peripheral) => {
         const connectedPeripheral = this.peripheral;
         if (peripheral.id === BTConfig.carPeripheralId) {
           this.peripheral = peripheral;
@@ -61,14 +49,14 @@ export class Bluetooth {
         }
     }
 
-    dispatchListener(listener, params) {
+    dispatchListener = (listener, params) => {
         const cb = this.eventListeners[listener];
         if (cb && typeof(cb) === 'function') {
             cb(params);
         }
     }
 
-    startScan(carPeripheralId, scanTimeout) {
+    startScan = (carPeripheralId, scanTimeout) => {
         if (!this.scanning) {
             this.peripheral = null;
             this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.CONNECTING});
@@ -79,7 +67,7 @@ export class Bluetooth {
         }
     }
 
-    handleBLEUpdateState(data) {
+    handleBLEUpdateState = (data) => {
         console.log(`Bluetooth: BLE Update state - ${data.state}`);
         if (data.state === 'on') {
             clearInterval(this.propmtTurnOnBluetoothId);
@@ -92,7 +80,7 @@ export class Bluetooth {
         }
     }
 
-    handleStopScan() {
+    handleStopScan = () => {
         this.scanning = false;
         if (this.peripheral) {
             console.log(`Bluetooth: Car found, now synchronizing...`);
@@ -103,7 +91,7 @@ export class Bluetooth {
         }
     }
 
-    async startSync(peripheral) {
+    startSync = async (peripheral) => {
         try {
             await BleManager.connect(peripheral.id);
             this.peripheral = {
@@ -121,7 +109,7 @@ export class Bluetooth {
         }
     }
 
-    async sendMessageToPeripheral(message) {
+    sendMessageToPeripheral = async (message) => {
         await BleManager.retrieveServices(this.peripheral.id);
         setTimeout(async () => {
             await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
@@ -133,7 +121,7 @@ export class Bluetooth {
         }, 300);
     }
 
-    handleDisconnectedPeripheral() {
+    handleDisconnectedPeripheral = () => {
         console.log(`Bluetooth: Lost connection with car, reconnectig...`);
         this.peripheral = null;
         clearInterval(this.lostConnectionIntervalId);
@@ -143,7 +131,7 @@ export class Bluetooth {
         this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
     }
 
-    handleUpdateValueForCharacteristic(data) {
+    handleUpdateValueForCharacteristic = (data) => {
         try {
             const value = bytesToString(data.value);
             if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
@@ -160,7 +148,7 @@ export class Bluetooth {
         }
     }
 
-    removeListeners() {
+    removeListeners = () => {
         this.handlerDiscover.remove();
         this.handlerStop.remove();
         this.handlerDisconnect.remove();
