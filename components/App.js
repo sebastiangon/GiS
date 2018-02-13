@@ -31,7 +31,7 @@ export default class App extends Component {
     this.onUpdateValueForCharacteristic = this.onUpdateValueForCharacteristic.bind(this);
 
     this.setActiveTab = this.setActiveTab.bind(this);
-    this.handleAppStateChange = this.handleAppStateChange.bind(this);
+    // this.handleAppStateChange = this.handleAppStateChange.bind(this);
     this.startSequence = this.startSequence.bind(this);    
   }
 
@@ -62,7 +62,7 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
       }
       if (data.garageSearchTimeout) {
-          console.log('garageTimeout')
+          this.pushNotif('¿Todavía estas en camino a casa ?');
           Alert.alert(
             'Hey !',
             '¿Todavía estas en camino a casa ?',
@@ -90,11 +90,11 @@ export default class App extends Component {
     notiService.scheduleNotification(message, new Date(Date.now()));
   }
 
-  handleAppStateChange(appState) {
-    if(appState === 'background') {
-      // notiService.scheduleNotification('${NotificationMessage}', new Date(Date.now() + (3 * 1000)));
-    }
-  }
+  // handleAppStateChange(appState) {
+  //   if(appState === 'background') {
+  //     notiService.scheduleNotification('${NotificationMessage}', new Date(Date.now() + (3 * 1000)));
+  //   }
+  // }
 
   // handleSendMail() {
   //   const mailList = [{ to: { name: 'NOMBRE CONTACTO EMERGENCIA', mail: 'sebastiangon11@gmail.com' }, from: { name: 'NOMBRE DEL USER DE APP' } } ];
