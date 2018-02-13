@@ -20,10 +20,11 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      activeTab: appTabsEnum.LANDING,
+      activeTab: appTabsEnum.SETTINGS,
       carConnectionStatus: connectionStatusEnum.STOPPED,
       garageConnectionStatus: connectionStatusEnum.STOPPED,
-      startSequenceEnabled: true
+      startSequenceEnabled: true,
+      promptSecurityCode: true,
     };
     this.lostGarageConnectionFired = false;
     this.garageSearchTimeoutFired = false;
@@ -34,7 +35,8 @@ export default class App extends Component {
 
     this.setActiveTab = this.setActiveTab.bind(this);
     // this.handleAppStateChange = this.handleAppStateChange.bind(this);
-    this.startSequence = this.startSequence.bind(this);    
+    this.startSequence = this.startSequence.bind(this);
+    this.onCodeAsserted = this.onCodeAsserted.bind(this);
   }
 
   componentDidMount() {
@@ -95,6 +97,11 @@ export default class App extends Component {
       }
   }
 
+  onCodeAsserted() {
+    this.setState({ promptSecurityCode: false });
+    Alert.alert('Code asserted');
+  }
+
   onPushNotification(noti) {
     console.log(`onPushNotification touched ${JSON.stringify(noti)}`);
   }
@@ -149,7 +156,7 @@ export default class App extends Component {
           {this.renderTab(this.state.activeTab)}
         </View>
         <TabBar onTabSelected={this.setActiveTab} activeTab={this.state.activeTab} />
-        <SecurityCode visible={true} />
+        <SecurityCode visible={this.state.promptSecurityCode} codeAsserted={this.onCodeAsserted}/>
       </View>
     );
   }

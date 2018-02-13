@@ -39,5 +39,8 @@ export default StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         textAlign: 'center'
+    },
+    inputError: {
+        borderBottomColor: '#f00',
     }
 });

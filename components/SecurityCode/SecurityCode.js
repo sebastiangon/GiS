@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Modal, TouchableOpacity, TextInput } from 'react-native';
+import { Text, View, Modal, TouchableOpacity, TextInput, AsyncStorage } from 'react-native';
 import { storage } from '../../utils/storageKeysEnum';
 import styles from './Styles';
 
@@ -8,14 +8,15 @@ export default class SecurityCode extends Component {
         super(props);
         this.state = {
             codeError: false,
-            securityCode: null
+            securityCode: null,
+            typedSecurityCode: null,
         }
         this.loadData = this.loadData.bind(this);
         this.assertCode = this.assertCode.bind(this);
-        this.setCode = this.setCode.bind(this);
+        this.onType = this.onType.bind(this);
     }
 
-    componenDidMount() {
+    componentDidMount() {
         this.loadData();
     }
 
@@ -26,28 +27,19 @@ export default class SecurityCode extends Component {
         }
     }
 
-    setCode(securityCode) {
-        this.setState({ securityCode });
-    }
-
-    validateName(name) {
-        if (code ) {
-            this.setState({ nameError: true, name });
-        } else {
-            this.setState({ nameError: false, name });
-        }
+    onType(typedSecurityCode) {
+        this.setState({ typedSecurityCode });
     }
 
     assertCode() {
-        this.validateEmail();
-        // if (this.state.name !== '' && this.state.email !== '' && !this.state.emailError) {
-        //     this.props.save({ name: this.state.name, email: this.state.email, id: this.state.id });
-        // }
+        if (this.state.securityCode === this.state.typedSecurityCode) {
+            this.props.codeAsserted();
+        }
     }
 
     render() {
         return(
-            <Modal visible={true} animationType={'slide'} onRequestClose={this.props.close} >
+            <Modal visible={this.props.visible} animationType={'slide'} onRequestClose={this.props.close} >
                 <View style={styles.container}>
                     <View style={styles.box}>
                         <Text style={styles.title}>Código de seguridad</Text>
@@ -61,7 +53,7 @@ export default class SecurityCode extends Component {
                                 keyboardType='number-pad'
                                 secureTextEntry={true}
                                 maxLength={4}
-                                onChangeText={(code) => this.setCode(code)}
+                                onChangeText={(code) => this.onType(code)}
                                 value={this.state.secretCode}
                             />
 
