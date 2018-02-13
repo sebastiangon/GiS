@@ -59,6 +59,7 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
       }
       if (data.lostGarageConnection) {
+          this.pushNotif('Lost garage connection notif');
           //  Fired after all the retries set in arduino sketch
           this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
           if (!this.lostGarageConnectionFired) {
