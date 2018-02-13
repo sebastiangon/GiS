@@ -1,7 +1,7 @@
 int oneSecond = 1000;
 int oneMinute = 60000;
 
-long garageSearchTimeoutPeriod = 10000;      //  Every 5 minutes, timeout
+long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout
 long garageSearchTimeoutLastMeasurement = 0;  //  Last time that garageSearch did timout
 
 
