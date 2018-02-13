@@ -59,13 +59,12 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
       }
       if (data.lostGarageConnection) {
-          this.pushNotif('Lost garage connection notif');
           //  Fired after all the retries set in arduino sketch
           this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
           if (!this.lostGarageConnectionFired) {
             this.lostGarageConnectionFired = true;
-            Alert.alert('lost garage connection');
-            //  Do magic
+            this.pushNotif('Intoduce el código');
+            Alert.alert('SECUESTRO !!!!!!!! o te fuiste man');
           }
       }
       if (data.garageSearchTimeout) {
@@ -94,7 +93,9 @@ export default class App extends Component {
   }
 
   pushNotif(message) {
-    notiService.scheduleNotification(message, new Date(Date.now()));
+    if(appState === 'background') {
+      notiService.scheduleNotification(message, new Date(Date.now()));
+    }
   }
 
   // handleAppStateChange(appState) {

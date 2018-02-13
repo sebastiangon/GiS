@@ -17,7 +17,7 @@ bool garageSearchTimeout = false;
 long BTLastConnectionMillis = 0; //  Bluetooth first connection milliseconds
 long RFLastConnectionMillis = 0; //  Radio first pong received milliseconds
 int RFretryCount = 0;
-int RFMaxRetries = 20;
+int RFMaxRetries = 15;
 
 byte addresses[][6] = {"1Node","2Node"};
 
