@@ -16,7 +16,7 @@ import { appTabsEnum } from '../utils/appTabsEnum';
 
 import styles from './Styles';
 
-const SECURITY_CODE_TIMEOUT = 3*60; //  Seconds
+const SECURITY_CODE_TIMEOUT = 180; //  Seconds
 
 export default class App extends Component {
   constructor() {
@@ -43,6 +43,8 @@ export default class App extends Component {
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
     this.bluetooth.addListener('updateValueForCharacteristic', this.onUpdateValueForCharacteristic);
     notiService.init(this.onPushNotification.bind(this));
+
+    this.startEmergencyCountdown();
   }
 
   onBluetoothConectionStateChange = (data) => {
@@ -68,19 +70,19 @@ export default class App extends Component {
           if (!this.lostGarageConnectionFired) {
             this.lostGarageConnectionFired = true;
             this.pushNotif('Introduce tu código');
-            this.startEMergencyCountdown();
+            this.startEmergencyCountdown();
           }
       }
       if (data.garageSearchTimeout) {
         if (!this.garageSearchTimeoutFired) {
           this.garageSearchTimeoutFired = true;
+          const countDownTimer = setTimeout(this.startEmergencyCountdown, 60000);
           this.pushNotif('¿Todavía estas en camino a casa ?');
           Alert.alert(
             'Hey !',
-            '¿Todavía estas en camino a casa ?',
+            '¿ Aún estas ahí ?',
             [
-              {text: 'No', onPress: this.startEmergencyCountdown },
-              {text: 'Si', onPress: () => {} },
+              {text: 'Si', onPress: () => { clearInterval(countDownTimer); this.garageSearchTimeoutFired = false }}
             ],
             { cancelable: false }
           )
@@ -104,7 +106,7 @@ export default class App extends Component {
   emergencyMail = () => {
     this.setState({ emergencySecondsElapsed: this.state.emergencySecondsElapsed += 1 });
     if (this.state.emergencySecondsElapsed >= SECURITY_CODE_TIMEOUT) {
-      this.
+      this.pushNotif('maiiiiiil');
       this.stopEmergencyCountdown();
     }
   }
@@ -117,9 +119,7 @@ export default class App extends Component {
   }
 
   onCodeAsserted = () => {
-    console.log(`propmt`);
-    this.setState({ promptSecurityCode: false });
-    Alert.alert('Code asserted');
+    this.stopEmergencyCountdown();
   }
 
   onPushNotification = (noti) => {

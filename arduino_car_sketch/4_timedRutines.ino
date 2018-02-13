@@ -1,7 +1,7 @@
 int oneSecond = 1000;
 int oneMinute = 60000;
 
-long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout --> 300000 ms
+long garageSearchTimeoutPeriod = 30000;      //  Every 5 minutes, timeout --> 300000 ms
 long garageSearchTimeoutLastMeasurement = 0;  //  Last time that garageSearch did timout
 
 long bluetoothDisconnectionMaxTime = 10000;

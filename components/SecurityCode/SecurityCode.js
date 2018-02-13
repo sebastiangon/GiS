@@ -10,11 +10,19 @@ export default class SecurityCode extends Component {
             codeError: false,
             securityCode: null,
             typedSecurityCode: null,
+            activeTime: 0
         }
     }
 
     componentDidMount() {
         this.loadData();
+        setInterval(this.onTick, 1000);
+    }
+
+    onTick = () => {
+        this.setState((prevState) => ({
+            activeTime: prevState.activeTime + 1
+        }))
     }
 
     loadData = async () => {
@@ -41,6 +49,7 @@ export default class SecurityCode extends Component {
                     <View style={styles.box}>
                         <Text style={styles.title}>Código de seguridad</Text>
                         <Text>{this.props.remainingSeconds}</Text>
+                        <Text>{this.state.activeTime}</Text>
                         <TextInput
                                 style={[styles.input, this.state.codeError ? styles.inputError : {}]}
                                 autoCapitalize='none'
