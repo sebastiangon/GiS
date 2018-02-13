@@ -43,7 +43,7 @@ export default class SecurityCode extends Component {
                 <View style={styles.container}>
                     <View style={styles.box}>
                         <Text style={styles.title}>Código de seguridad</Text>
-
+                        <Text>{this.props.remainingSeconds}</Text>
                         <TextInput
                                 style={[styles.input, this.state.codeError ? styles.inputError : {}]}
                                 autoCapitalize='none'

@@ -16,6 +16,8 @@ import { appTabsEnum } from '../utils/appTabsEnum';
 
 import styles from './Styles';
 
+const SECURITY_CODE_TIMEOUT = 3*60; //  Seconds
+
 export default class App extends Component {
   constructor() {
     super();
@@ -24,8 +26,10 @@ export default class App extends Component {
       carConnectionStatus: connectionStatusEnum.STOPPED,
       garageConnectionStatus: connectionStatusEnum.STOPPED,
       startSequenceEnabled: true,
-      promptSecurityCode: true,
+      promptSecurityCode: false,
+      emergencySecondsElapsed: 0
     };
+    this.securityCodeCountdownId = null;
     this.lostGarageConnectionFired = false;
     this.garageSearchTimeoutFired = false;
     this.bluetooth = null;
@@ -37,14 +41,17 @@ export default class App extends Component {
     // this.handleAppStateChange = this.handleAppStateChange.bind(this);
     this.startSequence = this.startSequence.bind(this);
     this.onCodeAsserted = this.onCodeAsserted.bind(this);
+    this.startEmergencyCountdown = this.startEmergencyCountdown.bind(this);
+    this.stopEmergencyCountdown = this.stopEmergencyCountdown.bind(this);
+    this.emergencyMail = this.emergencyMail.bind(this);
   }
 
   componentDidMount() {
     // AsyncStorage.clear();
+    // AppState.addEventListener('change', this.handleAppStateChange);
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
     this.bluetooth.addListener('updateValueForCharacteristic', this.onUpdateValueForCharacteristic);
-    // AppState.addEventListener('change', this.handleAppStateChange);
     notiService.init(this.onPushNotification.bind(this));
   }
 
@@ -63,6 +70,7 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
           this.lostGarageConnectionFired = false;
           this.garageSearchTimeoutFired = false;
+          thisl.stopEmergencyCountdown();
       }
       if (data.lostGarageConnection) {
           //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
@@ -70,7 +78,7 @@ export default class App extends Component {
           if (!this.lostGarageConnectionFired) {
             this.lostGarageConnectionFired = true;
             this.pushNotif('Introduce tu código');
-            Alert.alert('Aca se muestra el ingreso de código');
+            this.startEMergencyCountdown();
           }
       }
       if (data.garageSearchTimeout) {
@@ -81,13 +89,34 @@ export default class App extends Component {
             'Hey !',
             '¿Todavía estas en camino a casa ?',
             [
-              {text: 'No', onPress: () => console.warn('Not implemented') },
-              {text: 'Si', onPress: () => console.warn('Not implemented')},
+              {text: 'No', onPress: this.startEmergencyCountdown },
+              {text: 'Si', onPress: () => {} },
             ],
             { cancelable: false }
           )
         }
       }
+  }
+
+  startEmergencyCountdown() {
+    this.state.emergencySecondsElapsed = 0;
+    clearInterval(this.securityCodeCountdownId);
+    this.securityCodeCountdownId = setInterval(this.emergencyMail, 1000);
+    this.setState({ promptSecurityCode: true });
+  }
+
+  stopEmergencyCountdown() {
+    this.state.emergencySecondsElapsed = 0;
+    clearInterval(this.securityCodeCountdownId);
+    this.setState({ promptSecurityCode: false });
+  }
+
+  emergencyMail() {
+    this.setState({ emergencySecondsElapsed: this.state.emergencySecondsElapsed += 1 });
+    if (this.state.emergencySecondsElapsed >= SECURITY_CODE_TIMEOUT) {
+      Alert.alert('sendingMails');
+      this.stopEmergencyCountdown();
+    }
   }
 
   startSequence() {
@@ -117,10 +146,16 @@ export default class App extends Component {
   //   }
   // }
 
-  // handleSendMail() {
-  //   const mailList = [{ to: { name: 'NOMBRE CONTACTO EMERGENCIA', mail: 'sebastiangon11@gmail.com' }, from: { name: 'NOMBRE DEL USER DE APP' } } ];
-  //   mailService.sendMail(mailList);
-  // }
+  async handleSendMail() {
+    const emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
+    const userName = await AsyncStorage.getItem(storage.USER_NAME);
+    if (emergencyContacts && userName) {
+        const contacts = JSON.parse(emergencyContacts);
+        console.log(`Mailing: building contacts list - ${contacts}`);
+        mailService.sendMail(contacts);
+    }
+    // const mailList = [{ to: { name: 'NOMBRE CONTACTO EMERGENCIA', mail: 'sebastiangon11@gmail.com' }, from: { name: 'NOMBRE DEL USER DE APP' } } ];
+  }
 
   setActiveTab(activeTab) {
     this.setState({ activeTab });
@@ -151,7 +186,7 @@ export default class App extends Component {
   
   render() {
     if (this.state.promptSecurityCode) {
-      return (<SecurityCode codeAsserted={this.onCodeAsserted}/>);
+      return (<SecurityCode remainingSeconds={SECURITY_CODE_TIMEOUT - this.state.emergencySecondsElapsed} codeAsserted={this.onCodeAsserted}/>);
     } else {
       return (
         <View style={styles.container}>

@@ -49,6 +49,9 @@ export default class Landing extends Component {
                 <TouchableOpacity activeOpacity={0.8} style={styles.landingBtn} onPress={this.props.startSequence} >
                     <View><Text style={styles.landingBtnText}>{this.props.startSequenceEnabled ? 'Activar seguridad' : 'Seguridad iniciada'}</Text></View>
                 </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.8} style={styles.landingBtn} onPress={this.props.finishSequence} >
+                    <View><Text style={styles.landingBtnText}>{this.props.finishSequenceEnabled ? 'Activar seguridad' : 'Seguridad iniciada'}</Text></View>
+                </TouchableOpacity>
                 <View style={styles.connectionIndicators}>
                     <View style={styles.imageFrame}>
                         <Image style={styles.image} source={this.getCarIconSource()} />
