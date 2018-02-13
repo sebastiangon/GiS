@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeEventEmitter, Text, View, Button, AppState, AsyncStorage, Alert } from 'react-native';
+import { NativeEventEmitter, Text, View, Button, AppState, AsyncStorage, Alert, Modal } from 'react-native';
 import * as mailService from './../mail_service/mailService';
 import { Bluetooth } from '../utils/bluetooth/bluetooth';
 import { connectionStatusEnum } from '../utils/connectionStatusEnum';
@@ -9,6 +9,7 @@ import TabBar from './TabBar/TabBar';
 import Landing from './Landing/Landing';
 import EmergencyContacts from './EmergencyContacts/EmergencyContacts';
 import Settings from './Settings/Settings';
+import SecurityCode from './SecurityCode/SecurityCode';
 
 import * as notiService from '../utils/notificationService';
 import { appTabsEnum } from '../utils/appTabsEnum';
@@ -148,6 +149,7 @@ export default class App extends Component {
           {this.renderTab(this.state.activeTab)}
         </View>
         <TabBar onTabSelected={this.setActiveTab} activeTab={this.state.activeTab} />
+        <SecurityCode visible={true} />
       </View>
     );
   }

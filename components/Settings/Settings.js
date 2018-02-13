@@ -116,7 +116,6 @@ export default class Setting extends Component {
                                 keyboardType='number-pad'
                                 secureTextEntry={true}
                                 maxLength={4}
-                                // onChangeText={(name) => this.validateName(name)}
                                 value={this.state.secretCode}
                             />
                             <TextInput
@@ -127,7 +126,6 @@ export default class Setting extends Component {
                                 keyboardType='number-pad'
                                 secureTextEntry={true}
                                 maxLength={4}
-                                // onChangeText={(name) => this.validateName(name)}
                                 value={this.state.secretCode}
                             />
                             <ActivityIndicator style={styles.loading} animating={this.state.saving} color="black"/>
