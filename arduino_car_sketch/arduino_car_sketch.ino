@@ -14,8 +14,10 @@ int RFLed = 6;      //  Green led
 bool BTConnected = false;
 bool RFConnected = false;
 bool garageSearchTimeout = false;
-long BTFirstConnectionMillis = 0; //  Bluetooth first connection milliseconds
-long RFFirstConnectionMillis = 0; //  Radio first pong received milliseconds
+long BTLastConnectionMillis = 0; //  Bluetooth first connection milliseconds
+long RFLastConnectionMillis = 0; //  Radio first pong received milliseconds
+int RFretryCount = 0;
+int RFMaxRetries = 20;
 
 byte addresses[][6] = {"1Node","2Node"};
 

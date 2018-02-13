@@ -26,6 +26,9 @@ unsigned long start_time = micros();                        // Take the time, an
       
   if ( timeout ){                                             // Describe the results
       Serial.println(F("Failed, response timed out."));
+      if (RFLastConnectionMillis > 0 && RFretryCount < RFMaxRetries) {
+          RFretryCount++; 
+        }
   }else{
       unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
       radio.read( &got_time, sizeof(unsigned long) );
@@ -42,10 +45,15 @@ unsigned long start_time = micros();                        // Take the time, an
 
       if (got_time != 0) {
         RFConnected = true; //  Making contact with garage
+        RFretryCount = 0;   // Reset retry count
 
-         if (RFFirstConnectionMillis == 0) {
-            RFFirstConnectionMillis = millis(); //  If its the first time connecting, set firstConnectinoMillis
+         if (RFLastConnectionMillis == 0) {
+            RFLastConnectionMillis = millis(); //  If its the first time connecting, set firstConnectinoMillis
          }
+      } else {
+        if (RFLastConnectionMillis > 0 && RFretryCount < RFMaxRetries) {
+          RFretryCount++; 
+        }
       }
   }
 }

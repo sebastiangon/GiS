@@ -7,14 +7,19 @@ void execBluetooth() {
      Serial.write(BT.read());
      BTConnected = true;
      
-     if (BTFirstConnectionMillis == 0) {
-        BTFirstConnectionMillis = millis(); //  If its the first time connecting, set firstConnectinoMillis
+     if (BTLastConnectionMillis == 0) {
+        BTLastConnectionMillis = millis(); //  If its the first time connecting, set firstConnectinoMillis
      }
   }
   
   if (BTConnected) {
+    
+    String lostGarageConnectionStr = "false";
+    Serial.println(RFretryCount );
+    if ( RFLastConnectionMillis > 0 && !RFConnected && RFretryCount >= RFMaxRetries) {
+      lostGarageConnectionStr = "true";
+    }
 
-    String lostGarageConnectionStr = (RFFirstConnectionMillis > 0 && !RFConnected) ? "true" : "false";
     String garageConnectedStr = RFConnected ? "true" : "false";
     String garageSearchTimeoutStr = garageSearchTimeout ? "true" : "false";
     

@@ -24,7 +24,7 @@ export default class App extends Component {
       garageConnectionStatus: connectionStatusEnum.STOPPED,
       startSequenceEnabled: true
     };
-
+    this.lostGarageConnectionFired = false;
     this.bluetooth = null;
     this.checkCarConnectionsIntervalId = null;
     this.onBluetoothConectionStateChange = this.onBluetoothConectionStateChange.bind(this);
@@ -40,7 +40,7 @@ export default class App extends Component {
     this.bluetooth = new Bluetooth();
     this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
     this.bluetooth.addListener('updateValueForCharacteristic', this.onUpdateValueForCharacteristic);
-    AppState.addEventListener('change', this.handleAppStateChange);
+    // AppState.addEventListener('change', this.handleAppStateChange);
     notiService.init(this.onPushNotification.bind(this));
   }
 
@@ -59,7 +59,13 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
       }
       if (data.lostGarageConnection) {
-          this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
+          //  Fired after all the retries set in arduino sketch
+          this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
+          if (!this.lostGarageConnectionFired) {
+            this.lostGarageConnectionFired = true;
+            Alert.alert('lost garage connection');
+            //  Do magic
+          }
       }
       if (data.garageSearchTimeout) {
           this.pushNotif('¿Todavía estas en camino a casa ?');
