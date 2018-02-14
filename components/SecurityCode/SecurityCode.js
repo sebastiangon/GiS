@@ -10,19 +10,11 @@ export default class SecurityCode extends Component {
             codeError: false,
             securityCode: null,
             typedSecurityCode: null,
-            activeTime: 0
         }
     }
 
     componentDidMount() {
         this.loadData();
-        setInterval(this.onTick, 1000);
-    }
-
-    onTick = () => {
-        this.setState((prevState) => ({
-            activeTime: prevState.activeTime + 1
-        }))
     }
 
     loadData = async () => {

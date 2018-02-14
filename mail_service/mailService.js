@@ -1,24 +1,13 @@
 import { mail_service_endpoint } from './mail_service.config';
 
-/*
-    mailList = [
-        {
-            to: {
-                name: 'receptor name',
-                mail: 'receptor mail'
-            },
-            from: {
-                name: 'app user name'
-            }
-        }
-    ]
-*/
+/* mailList = [{ to: { name: 'receptor name', mail: 'receptor mail' }, from: { name: 'app user name' } }] */
 
 export const sendMail = (mailList) => {
-    mailList.map((mail) => {
-        const mailBody = generateMail(mail);
-        postMail(mailBody);
+    const mails = mailList.map((mail) => {
+        return generateMail(mail);
     });
+
+    postMail(mails);
 };
 
 generateMail = (mail) => {

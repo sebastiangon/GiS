@@ -10,6 +10,7 @@
     "convert-string": "0.1.0",
     "react": "16.2.0",
     "react-native": "0.52.0",
+    "react-native-background-timer": "^2.0.0",
     "react-native-ble-manager": "6.2.6",
     "react-native-push-notification": "^3.0.2",
     "react-native-swipeout": "^2.3.3",
