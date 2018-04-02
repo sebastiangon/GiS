@@ -18,18 +18,20 @@ import { appTabsEnum } from '../utils/appTabsEnum';
 import styles from './Styles';
 
 const SECURITY_CODE_TIMEOUT = 60; //  Seconds
+const initialState = {
+  activeTab: appTabsEnum.LANDING,
+  carConnectionStatus: connectionStatusEnum.STOPPED,
+  garageConnectionStatus: connectionStatusEnum.STOPPED,
+  startSequenceEnabled: true,
+  promptSecurityCode: false,
+  emergencySecondsElapsed: 0
+};
+
 
 export default class App extends Component {
   constructor() {
     super();
-    this.state = {
-      activeTab: appTabsEnum.LANDING,
-      carConnectionStatus: connectionStatusEnum.STOPPED,
-      garageConnectionStatus: connectionStatusEnum.STOPPED,
-      startSequenceEnabled: true,
-      promptSecurityCode: false,
-      emergencySecondsElapsed: 0
-    };
+    this.state = initialState;
     this.securityCodeCountdownId = null;
     this.lostGarageConnectionFired = false;
     this.garageTimeoutsWithoutAck = 0;
@@ -47,12 +49,17 @@ export default class App extends Component {
   }
 
   onBluetoothConectionStateChange = (data) => {
+
       this.setState({ carConnectionStatus: data.carConnectionStatus });
+
       if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
           this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, 3000); //Comes back in onUpdateValueForCharacteristic 
       } else {
           clearInterval(this.checkCarConnectionsIntervalId);
+          if (data.carConnectionStatus === connectionStatusEnum.DISCONNECTED) {
+            this.startEmergencyCountdown();
+          }
       }
   }
 
@@ -61,7 +68,7 @@ export default class App extends Component {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
           this.lostGarageConnectionFired = false;
           this.garageSearchTimeoutFired = false;
-          thisl.stopEmergencyCountdown();
+          this.stopEmergencyCountdown();
       }
       if (data.lostGarageConnection) {
           //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
@@ -120,8 +127,13 @@ export default class App extends Component {
       }
   }
 
+  finishSequence = () => {
+      this.setState({...initialState});
+  }
+
   onCodeAsserted = () => {
     this.stopEmergencyCountdown();
+    this.finishSequence();
   }
 
   onPushNotification = (noti) => {

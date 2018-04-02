@@ -86,8 +86,16 @@ export class Bluetooth {
             console.log(`Bluetooth: Car found, now synchronizing...`);
             this.startSync(this.peripheral);
         } else {
-            console.log(`Bluetooth: Not close enought to your car, retrying...`);
-            this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
+            if (this.lostConnectionSeconds > BTConfig.maxLostConnectionSecondsToStopEngine) {
+                //Propmt security code, by user or by connection lost
+                this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.DISCONNECTED});
+                clearInterval(this.lostConnectionIntervalId);
+                this.lostConnectionSeconds = 0;
+                //Dont reconnect again, end of main flow
+            } else {
+                console.log(`Bluetooth: Not close enought to your car, retrying...`);
+                this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
+            }
         }
     }
 
@@ -126,7 +134,7 @@ export class Bluetooth {
         this.peripheral = null;
         clearInterval(this.lostConnectionIntervalId);
         this.lostConnectionIntervalId = setInterval(() => {
-            this.lostConnectionSeconds = this.lostConnectionSeconds =+1 ;
+            this.lostConnectionSeconds = this.lostConnectionSeconds +1 ;
         },1000);
         this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
     }
@@ -153,5 +161,6 @@ export class Bluetooth {
         this.handlerStop.remove();
         this.handlerDisconnect.remove();
         this.handlerUpdate.remove();
+        this.updateState.remove();
     }
 };

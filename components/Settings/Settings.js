@@ -79,8 +79,12 @@ export default class Setting extends Component {
     save = async () => {
         Keyboard.dismiss();
         if (!this.state.nameError && !this.state.codeError && !this.state.verificationCodeError) {
-            await AsyncStorage.setItem(storage.USER_NAME, this.state.userName);
-            await AsyncStorage.setItem(storage.SECURITY_CODE, this.state.securityCode);
+            if (this.state.userName) {
+                await AsyncStorage.setItem(storage.USER_NAME, this.state.userName);
+            }
+            if (this.state.securityCode) {
+                await AsyncStorage.setItem(storage.SECURITY_CODE, this.state.securityCode);
+            }
         }
     }
 
@@ -133,7 +137,7 @@ export default class Setting extends Component {
                                 placeholder="Ingrese un código de 4 números"
                                 spellCheck={false}
                                 keyboardType='number-pad'
-                                secureTextEntry={true}
+                                // secureTextEntry={true}
                                 maxLength={4}
                                 value={this.state.securityCode}
                                 onChangeText={(code) => this.validateCode(code)}
@@ -144,7 +148,7 @@ export default class Setting extends Component {
                                 autoCapitalize='none'
                                 spellCheck={false}
                                 keyboardType='number-pad'
-                                secureTextEntry={true}
+                                // secureTextEntry={true}
                                 maxLength={4}
                                 value={this.state.verificationCode}
                                 onChangeText={(code) => this.validateConfirmationCode(code)}

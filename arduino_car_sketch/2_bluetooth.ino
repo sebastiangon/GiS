@@ -32,7 +32,7 @@ void execBluetooth() {
     
     String jsonResponse = "{ \"lostGarageConnection\":" + lostGarageConnectionStr + ",\"garageConnected\":" + garageConnectedStr + ",\"garageSearchTimeout\":" + garageSearchTimeoutStr + "}" + ">"; //  DONT REMOVE THE >, ITS THE EOS CHARACTER
     
-    garageSearchTimeout = false; //  Once sent, reset it 
+    garageSearchTimeout = false; //  Once sent, reset the flag
 
     Serial.println(jsonResponse);
 

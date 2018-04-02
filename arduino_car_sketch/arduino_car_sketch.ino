@@ -20,6 +20,11 @@ long RFLastConnectionMillis = 0; //  Radio first pong received milliseconds
 int RFretryCount = 0;
 int RFMaxRetries = 15;
 
+long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout --> 300000 ms
+long garageSearchTimeoutLastMeasurement = 0;  //  Last time that garageSearch did timout
+
+long bluetoothDisconnectionMaxTime = 10000;
+
 byte addresses[][6] = {"1Node","2Node"};
 
 void setup() {
