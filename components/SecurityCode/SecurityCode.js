@@ -10,6 +10,7 @@ export default class SecurityCode extends Component {
             codeError: false,
             securityCode: null,
             typedSecurityCode: null,
+            retries: 3
         }
     }
 
@@ -29,6 +30,14 @@ export default class SecurityCode extends Component {
     }
 
     assertCode = () => {
+        this.setState({
+            retries: this.state.retries - 1
+        })
+
+        if (this.state.retries === 1) {
+            this.props.codeMaxTriesExeded();
+        }
+
         if (this.state.securityCode === this.state.typedSecurityCode) {
             this.props.codeAsserted();
         }
@@ -57,7 +66,9 @@ export default class SecurityCode extends Component {
 
                         <TouchableOpacity activeOpacity={0.8} style={styles.save} onPress={this.assertCode}>
                             <View><Text style={styles.saveText}>Aceptar</Text></View>
-                        </TouchableOpacity>                        
+                        </TouchableOpacity>     
+
+                        <Text style={styles.warn}>Reintentos: {this.state.retries}</Text>                 
                     </View>
                 </View>
           </View>

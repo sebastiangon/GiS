@@ -136,6 +136,12 @@ export default class App extends Component {
     this.finishSequence();
   }
 
+  onCodeMaxTriesExeded = () => {
+    this.stopEmergencyCountdown();
+    this.finishSequence();
+    this.emergencyMail();
+  }
+
   onPushNotification = (noti) => {
     console.log(`onPushNotification touched ${JSON.stringify(noti)}`);
   }
@@ -202,7 +208,7 @@ export default class App extends Component {
   
   render() {
     if (this.state.promptSecurityCode) {
-      return (<SecurityCode remainingSeconds={SECURITY_CODE_TIMEOUT - this.state.emergencySecondsElapsed} codeAsserted={this.onCodeAsserted}/>);
+      return (<SecurityCode codeMaxTriesExeded={this.onCodeMaxTriesExeded} remainingSeconds={SECURITY_CODE_TIMEOUT - this.state.emergencySecondsElapsed} codeAsserted={this.onCodeAsserted}/>);
     } else {
       return (
         <View style={styles.container}>

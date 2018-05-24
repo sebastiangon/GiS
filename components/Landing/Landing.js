@@ -13,27 +13,23 @@ export default class Landing extends Component {
 
     getCarIconSource = () => {
         switch(this.props.carConnectionStatus) {
-            case connectionStatusEnum.STOPPED:
-                return assets.carCross;
             case connectionStatusEnum.CONNECTING:
                 return assets.car;
             case connectionStatusEnum.CONNECTED:
                 return assets.carCheck;
             default:
-                return null;
+                return assets.carCross;
         }
     }
 
     getHouseIconSource = () => {
         switch(this.props.garageConnectionStatus) {
-            case connectionStatusEnum.STOPPED:
-                return assets.homeCross;
             case connectionStatusEnum.CONNECTING:
                 return assets.home;
             case connectionStatusEnum.CONNECTED:
                 return assets.homeCheck;
             default:
-                return null;
+                return assets.homeCross;
         }
     }
 

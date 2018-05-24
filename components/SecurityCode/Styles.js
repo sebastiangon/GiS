@@ -15,6 +15,12 @@ export default StyleSheet.create({
         margin: 10,
         fontWeight: '600',
     },
+    warn: {
+        fontSize: 20,
+        margin: 6,
+        fontWeight: '600',
+        color: 'red',
+    },
     save: {
         margin: 10,
         backgroundColor: '#147bcd',
