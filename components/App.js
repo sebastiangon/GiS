@@ -139,7 +139,7 @@ export default class App extends Component {
   onCodeMaxTriesExeded = () => {
     this.stopEmergencyCountdown();
     this.finishSequence();
-    this.emergencyMail();
+    this.handleSendMails();
   }
 
   onPushNotification = (noti) => {

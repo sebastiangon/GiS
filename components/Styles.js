@@ -9,7 +9,7 @@ export default StyleSheet.create({
     },
     activeTabContainer: {
       flex: 1,
-      backgroundColor: '#444',
+      backgroundColor: '#DDD',
       marginBottom: 50, //TabBar visible
     }
   });

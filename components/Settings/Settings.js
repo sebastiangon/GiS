@@ -118,10 +118,10 @@ export default class Setting extends Component {
                             style={[styles.garageButton, this.state.garageLocation ? styles.green : {}]}
                             onPress={this.setGarage}
                         >
-                            <View><Text style={styles.garageButtonText}>Usar ubicación como garaje</Text></View>
+                            <View><Text style={styles.garageButtonText}>Usar ubicación como garage</Text></View>
                         </TouchableOpacity>
                         <View style={styles.garageNotSet}>
-                            {!this.state.garageLocation && <Text style={styles.garageNotSetText}>No has guardado la ubicación de tu garaje</Text>}
+                            {!this.state.garageLocation && <Text style={styles.garageNotSetText}>No has guardado la ubicación de tu garage</Text>}
                         </View>
                         <Text style={styles.coordinates}>
                             {this.state.garageLocation &&
