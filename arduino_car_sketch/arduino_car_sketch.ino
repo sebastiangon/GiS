@@ -11,19 +11,12 @@ int engineLed = 3;  //  Yellow led
 int BTLed = 5;      //  Blue led
 int RFLed = 6;      //  Green led
 
-bool BTConnected = false;
-bool RFConnected = false;
-bool garageSearchTimeout = false;
-long BTLastConnectionMillis = 0; //  Bluetooth first connection milliseconds
-long BTLastDisconnectionMillis = 0; //  Bluetooth first connection milliseconds
-long RFLastConnectionMillis = 0; //  Radio first pong received milliseconds
-int RFretryCount = 0;
-int RFMaxRetries = 15;
-
-long garageSearchTimeoutPeriod = 300000;      //  Every 5 minutes, timeout --> 300000 ms
-long garageSearchTimeoutLastMeasurement = 0;  //  Last time that garageSearch did timout
-
-long bluetoothDisconnectionMaxTime = 10000;
+bool btConnected = false;
+bool rfConnected = false;
+bool madeRadioContact = false;
+bool madeBluetoothContact = false;
+long bTLastDisconnectionMillis = 0; //  Bluetooth disconnection data, to start counting when to stop the car
+long stopEngineTimeout = 10000; //  This at last is the time to stop the car.
 
 byte addresses[][6] = {"1Node","2Node"};
 
