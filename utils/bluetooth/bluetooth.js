@@ -13,6 +13,7 @@ export class Bluetooth {
         this.peripheral = null;
         this.reScanCount = 0;
         this.lastConnectionDate = null;
+        this.forcedDisconnection = false;
         this.characteristicValueBuffer = '';
         this.onBluetoothConectionStateChange = onBluetoothConectionStateChange;
         this.receiveBluetoothMessage = receiveBluetoothMessage;
@@ -90,41 +91,45 @@ export class Bluetooth {
     }
 
     handleDisconnectedPeripheral = () => {
-        console.log(`GiS: handleDisconnectedPeripheral - Bluetooth: Lost connection with car, reconnectig...`);
+        console.log(`GiS: handleDisconnectedPeripheral - Bluetooth: Lost connection with car ${this.forcedDisconnection ? 'FORCED' : ''}`);
         this.peripheral = null;
         this.reScanCount = 0;
-        this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
+        if (!this.forcedDisconnection) {
+            this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
+        }
+        this.forcedDisconnection = false;
     }
 
     sendMessageToPeripheral = async (message) => {
         console.log(`GiS: sendMessageToPeripheral - ${message}`)
-        // await BleManager.retrieveServices(this.peripheral.id);
-        // setTimeout(async () => {
-        //     await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
-        //     console.log(`Bluetooth: started notification on ${this.peripheral.id}`);
-        //     setTimeout(async () => {
-        //         await BleManager.write(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes(message));
-        //         console.log(`Bluetooth: SentMessageToPeripheral - ${message}`);
-        //     }, 500);
-        // }, 300);
+        await BleManager.retrieveServices(this.peripheral.id);
+        setTimeout(async () => {
+            await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
+            console.log(`GiS: Bluetooth: started notification on ${this.peripheral.id}`);
+            setTimeout(async () => {
+                await BleManager.write(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes(message));
+                console.log(`GiS: Bluetooth: SentMessageToPeripheral - ${message}`);
+            }, 500);
+        }, 300);
     }
 
     handleUpdateValueForCharacteristic = (data) => {
-        console.log(`GiS: handleUpdateValueForCharacteristic - data`)
-        // try {
-        //     const value = bytesToString(data.value);
-        //     if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
-        //         const valueSplit = value.split('>');
-        //         this.characteristicValueBuffer += valueSplit[0];
-        //         const responseJson = JSON.parse(this.characteristicValueBuffer);
-        //         this.dispatchListener('updateValueForCharacteristic', responseJson);
-        //         this.characteristicValueBuffer = valueSplit[1]; // Set the buffer with the surplus part of the incoming value (after the >)...
-        //     } else {
-        //         this.characteristicValueBuffer += value;
-        //     }
-        // } catch (error) {
-        //     console.warn(`Bluetooth: handleUpdateValueForCharacteristic error: ${error.message}`);
-        // }
+        console.log(`GiS: handleUpdateValueForCharacteristic`)
+        try {
+            const value = bytesToString(data.value);
+            if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
+                const valueSplit = value.split('>');
+                this.characteristicValueBuffer += valueSplit[0];
+                const responseJson = JSON.parse(this.characteristicValueBuffer);
+                console.log(`GiS: receivedBTData - ${this.characteristicValueBuffer}`);
+                this.receiveBluetoothMessage(responseJson);
+                this.characteristicValueBuffer = valueSplit[1]; // Set the buffer with the surplus part of the incoming value (after the >)...
+            } else {
+                this.characteristicValueBuffer += value;
+            }
+        } catch (error) {
+            console.warn(`GiS: Bluetooth: handleUpdateValueForCharacteristic error: ${error.message}`);
+        }
     }
 
     handleBLEUpdateState = (data) => {
@@ -134,6 +139,7 @@ export class Bluetooth {
 
     finish = () => {
         console.log(`GiS: finish - finishing bluetooth connection`);
+        this.forcedDisconnection = true; // Avoid reconnection when handleDisconnectedPeripheral
         if (this.peripheral) {
             BleManager.disconnect(this.peripheral.id);
             this.peripheral = null;

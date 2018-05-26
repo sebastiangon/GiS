@@ -51,6 +51,9 @@ export default class Landing extends Component {
                         { garageConnectionStatus === connectionStatusEnum.CONNECTING && <ActivityIndicator style={styles.loading} size="large" color="#fff" />}
                     </View>
                 </View>
+                <TouchableOpacity activeOpacity={0.8} style={!this.props.startSequenceEnabled ? styles.landingBtn : styles.landingBtnDis} disabled={this.props.startSequenceEnabled} onPress={this.props.finishSequence}  >
+                    <View><Text style={styles.landingBtnText}>Desactivar seguridad</Text></View>
+                </TouchableOpacity>
             </View>
         );
     }
