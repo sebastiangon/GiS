@@ -123,8 +123,8 @@ export default class App extends Component {
   }
 
   finishSequence = () => {
-      clearInterval(this.checkCarConnectionsIntervalId);
-      this.bluetooth.finish();
+      // clearInterval(this.checkCarConnectionsIntervalId);
+      // this.bluetooth.finish();
       this.setState({...initialState});
   }
 
@@ -184,7 +184,6 @@ export default class App extends Component {
           garageConnectionStatus = {this.state.garageConnectionStatus}
           startSequenceEnabled = {this.state.startSequenceEnabled}
           startSequence = {this.startSequence}
-          finishSequence = {this.finishSequence}
         />;
       case(appTabsEnum.SETTINGS):
         return <Settings />;
