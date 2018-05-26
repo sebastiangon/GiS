@@ -14,6 +14,15 @@ export default StyleSheet.create({
         alignItems: 'center',
         padding: 15,
     },
+    landingBtnDis: {
+        margin: 5,
+        backgroundColor: 'gray',
+        borderRadius: 6,
+        width: '90%',
+        alignSelf: 'center',
+        alignItems: 'center',
+        padding: 15,
+    },
     landingBtnText: {
         color: 'white',
     },

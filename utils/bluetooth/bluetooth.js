@@ -9,15 +9,13 @@ const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export class Bluetooth {
-    constructor() {
-        this.scanning = false;
+    constructor(onBluetoothConectionStateChange, receiveBluetoothMessage) {
         this.peripheral = null;
-        this.lostConnectionIntervalId = null;
-        this.lostConnectionSeconds = 0;
-        this.eventListeners = {};
-        this.propmtTurnOnBluetoothId = 0;
-        this.showingAlert = false;
+        this.reScanCount = 0;
+        this.lastConnectionDate = null;
         this.characteristicValueBuffer = '';
+        this.onBluetoothConectionStateChange = onBluetoothConectionStateChange;
+        this.receiveBluetoothMessage = receiveBluetoothMessage;
 
         //BleManagerEmitter callbacks
         this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',this.handleDiscoverPeripheral );
@@ -25,142 +23,123 @@ export class Bluetooth {
         this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
         this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
         this.updateState = bleManagerEmitter.addListener('BleManagerDidUpdateState', this.handleBLEUpdateState);
+        BleManager.start({showAlert: false}).then(() => { console.log('GiS: Bluetooth Module initialized, ready to start'); }).catch(() => {console.log('GiS: Fail on start BleManager')});
     }
 
     init = () => {
-        BleManager.start({showAlert: false})
-        .then(() => {
-            console.log('Bluetooth: Module initialized');
-        });
-    }
-
-    addListener = (evt, cb) => {
-        this.eventListeners[evt] = cb;
-    }
-    
-    handleDiscoverPeripheral = (peripheral) => {
-        const connectedPeripheral = this.peripheral;
-        if (peripheral.id === BTConfig.carPeripheralId) {
-          this.peripheral = peripheral;
-          console.log(`Bluetooth: Discovered peripheral`);
-          BleManager.stopScan()
-            .then(() => { this.handleStopScan() })
-            .catch(() => { this.log('Error stopping scanning.') });
-        }
-    }
-
-    dispatchListener = (listener, params) => {
-        const cb = this.eventListeners[listener];
-        if (cb && typeof(cb) === 'function') {
-            cb(params);
-        }
+        this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
     }
 
     startScan = (carPeripheralId, scanTimeout) => {
-        if (!this.scanning) {
+        this.reScanCount = this.reScanCount + 1;
+        console.log(`GiS: StartScan ${carPeripheralId} ${scanTimeout} reScanCount: ${this.reScanCount}`);
+
+        if (this.reScanCount < BTConfig.maxReScanTries) { //  Keep searching
+            this.onBluetoothConectionStateChange({carConnectionStatus: connectionStatusEnum.CONNECTING})
+            BleManager.scan([], scanTimeout, true).then((results) => { console.log(`GiS: Bluetooth: Searching car...`)});
+        } else if (this.lastConnectionDate) { //  If the lastConnectionDate is not null, then the car got away or shutted down (DISCONNECTION), fire disconnection, and reset bluetooth
             this.peripheral = null;
-            this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.CONNECTING});
-            BleManager.scan([], scanTimeout, true).then((results) => {
-                console.log(`Bluetooth: Searching car...`);
-                this.scanning = true;
-              });
+            this.reScanCount = 0;
+            this.lastConnectionDate = null;
+            this.onBluetoothConectionStateChange({carConnectionStatus: connectionStatusEnum.DISCONNECTED})
+        } else if (this.lastConnectionDate == null) { //  If the lastConnectionDate is null, then the car was never connected (STTOPED), reset bluetooth
+            this.peripheral = null;
+            this.reScanCount = 0;
+            this.lastConnectionDate = null;
+            this.onBluetoothConectionStateChange({carConnectionStatus: connectionStatusEnum.STOPPED})
         }
     }
 
-    handleBLEUpdateState = (data) => {
-        console.log(`Bluetooth: BLE Update state - ${data.state}`);
-        if (data.state === 'on') {
-            clearInterval(this.propmtTurnOnBluetoothId);
-            this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
-        } else {
-            this.propmtTurnOnBluetoothId = setInterval(() => {
-                // TODO reemplazar por un mensaje en UI
-                Alert.alert('Error', 'El bluetooth se encuentra desactivado. Vaya a Ajustes --> Bluetooth para activarlo');
-            }, 15000);
+    handleDiscoverPeripheral = (peripheral) => {
+        if (peripheral.id === BTConfig.carPeripheralId) {
+          this.peripheral = peripheral;
+          this.tryStopScan();
         }
+    }
+
+    tryStopScan = () => {
+        console.log(`GiS: tryStopScan - Attemping to stop bluetooth scan`)
+        BleManager.stopScan()
+        .then(() => { this.handleStopScan() })
+        .catch(() => { this.log('GiS: Error stopping scanning.') });
     }
 
     handleStopScan = () => {
-        this.scanning = false;
+        console.log(`GiS: handleStopScan - scan stopped`);
         if (this.peripheral) {
-            console.log(`Bluetooth: Car found, now synchronizing...`);
+            console.log(`GiS: Bluetooth: Car found, now synchronizing...`);
             this.startSync(this.peripheral);
         } else {
-            if (this.lostConnectionSeconds > BTConfig.maxLostConnectionSecondsToStopEngine) {
-                //Propmt security code, by user or by connection lost
-                this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.DISCONNECTED});
-                clearInterval(this.lostConnectionIntervalId);
-                this.lostConnectionSeconds = 0;
-                //Dont reconnect again, end of main flow
-            } else {
-                console.log(`Bluetooth: Not close enought to your car, retrying...`);
-                this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
-            }
+            console.log(`GiS: Bluetooth: Car not found, retrying`);
+            this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
         }
     }
 
     startSync = async (peripheral) => {
         try {
             await BleManager.connect(peripheral.id);
-            this.peripheral = {
-                ...this.peripheral,
-                connected: true
-            };
-            this.lostConnectionSeconds = 0;
-            clearInterval(this.lostConnectionIntervalId);
-            //this.sendMessageToPeripheral(this.peripheral); 
-            console.log(`Bluetooth: Connected to ${peripheral.id}`);
-            this.dispatchListener('connectionStatusChange', {carConnectionStatus: connectionStatusEnum.CONNECTED});
+            this.peripheral = { ...this.peripheral, connected: true };
+            this.reScanCount = 0;
+            this.lastConnectionDate = Date.now();
+            console.log(`GiS: startSync - Connected to ${peripheral.id}`);
+            this.onBluetoothConectionStateChange({carConnectionStatus: connectionStatusEnum.CONNECTED})
         }
         catch(e) {
-            console.warn(`Bluetooth: Error sync bluetooth - ${e.message}`);
+            console.warn(`GiS: startSync - Error sync bluetooth - ${e.message}`);
         }
-    }
-
-    sendMessageToPeripheral = async (message) => {
-        await BleManager.retrieveServices(this.peripheral.id);
-        setTimeout(async () => {
-            await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
-            console.log(`Bluetooth: started notification on ${this.peripheral.id}`);
-            setTimeout(async () => {
-                await BleManager.write(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes(message));
-                console.log(`Bluetooth: SentMessageToPeripheral - ${message}`);
-            }, 500);
-        }, 300);
     }
 
     handleDisconnectedPeripheral = () => {
-        console.log(`Bluetooth: Lost connection with car, reconnectig...`);
+        console.log(`GiS: handleDisconnectedPeripheral - Bluetooth: Lost connection with car, reconnectig...`);
         this.peripheral = null;
-        clearInterval(this.lostConnectionIntervalId);
-        this.lostConnectionIntervalId = setInterval(() => {
-            this.lostConnectionSeconds = this.lostConnectionSeconds +1 ;
-        },1000);
+        this.reScanCount = 0;
         this.startScan(BTConfig.carPeripheralId, BTConfig.scanSeconds);
     }
 
-    handleUpdateValueForCharacteristic = (data) => {
-        try {
-            const value = bytesToString(data.value);
-            if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
-                const valueSplit = value.split('>');
-                this.characteristicValueBuffer += valueSplit[0];
-                const responseJson = JSON.parse(this.characteristicValueBuffer);
-                this.dispatchListener('updateValueForCharacteristic', responseJson);
-                this.characteristicValueBuffer = valueSplit[1]; // Set the buffer with the surplus part of the incoming value (after the >)...
-            } else {
-                this.characteristicValueBuffer += value;
-            }
-        } catch (error) {
-            console.warn(`Bluetooth: handleUpdateValueForCharacteristic error: ${error.message}`);
-        }
+    sendMessageToPeripheral = async (message) => {
+        console.log(`GiS: sendMessageToPeripheral - ${message}`)
+        // await BleManager.retrieveServices(this.peripheral.id);
+        // setTimeout(async () => {
+        //     await BleManager.startNotification(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic);
+        //     console.log(`Bluetooth: started notification on ${this.peripheral.id}`);
+        //     setTimeout(async () => {
+        //         await BleManager.write(this.peripheral.id, BTConfig.carService, BTConfig.carCharacteristic, stringToBytes(message));
+        //         console.log(`Bluetooth: SentMessageToPeripheral - ${message}`);
+        //     }, 500);
+        // }, 300);
     }
 
-    removeListeners = () => {
-        this.handlerDiscover.remove();
-        this.handlerStop.remove();
-        this.handlerDisconnect.remove();
-        this.handlerUpdate.remove();
-        this.updateState.remove();
+    handleUpdateValueForCharacteristic = (data) => {
+        console.log(`GiS: handleUpdateValueForCharacteristic - data`)
+        // try {
+        //     const value = bytesToString(data.value);
+        //     if (value.includes('>')) {  //  End of secuence char F.E: "...old secuence part } > { New secuence part..."
+        //         const valueSplit = value.split('>');
+        //         this.characteristicValueBuffer += valueSplit[0];
+        //         const responseJson = JSON.parse(this.characteristicValueBuffer);
+        //         this.dispatchListener('updateValueForCharacteristic', responseJson);
+        //         this.characteristicValueBuffer = valueSplit[1]; // Set the buffer with the surplus part of the incoming value (after the >)...
+        //     } else {
+        //         this.characteristicValueBuffer += value;
+        //     }
+        // } catch (error) {
+        //     console.warn(`Bluetooth: handleUpdateValueForCharacteristic error: ${error.message}`);
+        // }
+    }
+
+    handleBLEUpdateState = (data) => {
+        console.log(`GiS: Bluetooth BLE Update state - ${data.state}`);
+        //  Estado del bluetooth del telefono, no de la conexion con el arduino --> this.bluetoothStatus = data.state; // 'on', 'off'
+    }
+
+    finish = () => {
+        console.log(`GiS: finish - finishing bluetooth connection`);
+        if (this.peripheral) {
+            BleManager.disconnect(this.peripheral.id);
+            this.peripheral = null;
+            this.reScanCount = 0;
+            this.lastConnectionDate = null;
+            this.onBluetoothConectionStateChange({carConnectionStatus: connectionStatusEnum.STOPPED})
+        }
     }
 };

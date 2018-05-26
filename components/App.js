@@ -41,17 +41,12 @@ export default class App extends Component {
 
   componentDidMount() {
     // AsyncStorage.clear();
-    // AppState.addEventListener('change', this.handleAppStateChange);
-    this.bluetooth = new Bluetooth();
-    this.bluetooth.addListener('connectionStatusChange', this.onBluetoothConectionStateChange);
-    this.bluetooth.addListener('updateValueForCharacteristic', this.onUpdateValueForCharacteristic);
+    this.bluetooth = new Bluetooth(this.onBluetoothConectionStateChange, this.receiveBluetoothMessage);
     notiService.init(this.onPushNotification.bind(this));
   }
 
   onBluetoothConectionStateChange = (data) => {
-
       this.setState({ carConnectionStatus: data.carConnectionStatus });
-
       if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
           this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, 3000); //Comes back in onUpdateValueForCharacteristic 
@@ -59,11 +54,13 @@ export default class App extends Component {
           clearInterval(this.checkCarConnectionsIntervalId);
           if (data.carConnectionStatus === connectionStatusEnum.DISCONNECTED) {
             this.startEmergencyCountdown();
+          } else if (data.carConnectionStatus === connectionStatusEnum.STOPPED) {
+            this.setState({startSequenceEnabled: true})
           }
       }
   }
 
-  onUpdateValueForCharacteristic = (data) => {
+  receiveBluetoothMessage = (data) => {
       if (data.garageConnected) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
           this.lostGarageConnectionFired = false;
@@ -121,13 +118,12 @@ export default class App extends Component {
   }
 
   startSequence = () => {
-      if (this.state.startSequenceEnabled) {
-          this.bluetooth.init();
-          this.setState({ startSequenceEnabled: false });
-      }
+        this.bluetooth.init();
+        this.setState({ startSequenceEnabled: false });
   }
 
   finishSequence = () => {
+      this.bluetooth.finish();
       this.setState({...initialState});
   }
 
@@ -149,12 +145,6 @@ export default class App extends Component {
   pushNotif = (message) => {
     notiService.scheduleNotification(message, new Date(Date.now()));
   }
-
-  // handleAppStateChange = (appState) => {
-  //   if(appState === 'background') {
-  //     notiService.scheduleNotification('${NotificationMessage}', new Date(Date.now() + (3 * 1000)));
-  //   }
-  // }
 
   handleSendMails = async () => {
     const emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
@@ -193,17 +183,13 @@ export default class App extends Component {
           garageConnectionStatus = {this.state.garageConnectionStatus}
           startSequenceEnabled = {this.state.startSequenceEnabled}
           startSequence = {this.startSequence}
+          finishSequence = {this.finishSequence}
         />;
       case(appTabsEnum.SETTINGS):
         return <Settings />;
       default:
         return 'INVALID_TAB_VALUE';
     }
-  }
-
-  componentWillUnmount() {
-    this.bluetooth.removeListeners();
-    AppState.removeEventListener('change', this.handleAppStateChange);
   }
   
   render() {
