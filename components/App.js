@@ -33,8 +33,13 @@ export default class App extends Component {
     super();
     this.state = initialState;
     this.securityCodeCountdownId = null;
-    this.lostGarageConnectionFired = false;
+    
+    // Radio flags
+    this.garageSearchTime = 5000;
+    this.garageSearchTimeout = false;
     this.garageTimeoutsWithoutAck = 0;
+    this.garageSearchTimeoutIntervalId = null;
+
     this.bluetooth = null;
     this.checkCarConnectionsIntervalId = null;
   }
@@ -49,6 +54,11 @@ export default class App extends Component {
       this.setState({ carConnectionStatus: data.carConnectionStatus });
       if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
+
+          //  Set garage search timeout
+          console.log(`GiS: setting garageSearchTimeout`);
+          this.garageSearchTimeoutIntervalId = setInterval(this.garageSearchTime, () => { this.garageSearchTimeout = true; });
+
           this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, 3000); //Comes back in onUpdateValueForCharacteristic 
       } else {
           clearInterval(this.checkCarConnectionsIntervalId);
@@ -61,40 +71,55 @@ export default class App extends Component {
   }
 
   receiveBluetoothMessage = (data) => {
-      if (data.garageConnected) {
+      if (data.rfConnected) {
+          clearInterval(this.garageSearchTimeoutIntervalId);
+          this.garageSearchTimeout = false;
           this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
-          this.lostGarageConnectionFired = false;
-          this.garageSearchTimeoutFired = false;
           this.stopEmergencyCountdown();
+      } else if (data.madeRadioContact) { //  If NOT connected but madeRadioConntact, we have lost the connection
+        // Do the necessary retries and start emergency when needed
       }
-      if (data.lostGarageConnection) {
-          //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
-          this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
-          if (!this.lostGarageConnectionFired) {
-            this.lostGarageConnectionFired = true;
-            this.pushNotif('Introduce tu código');
-            this.startEmergencyCountdown();
-          }
-      }
-      if (data.garageSearchTimeout) {
-        this.garageTimeoutsWithoutAck += 1;
-        if (this.garageTimeoutsWithoutAck === 1) {
-          // Si es el primer timeout del garage...
-          this.pushNotif('¿Todavía estas en camino a casa ?');
-          Alert.alert(
-            'Hey !',
-            '¿ Aún estas ahí ?',
-            [
-              {text: 'Si', onPress: () => { this.garageTimeoutsWithoutAck = 0 }}
-            ],
-            { cancelable: false }
-          )
+      else if (this.garageSearchTimeout) {  //  If NOT connected and NOT madeRadioContact, then keep searching... did de search time out ?
+          console.log(`GiS: receiveBluetoothMessage - garageSearchTimeout ${this.garageTimeoutsWithoutAck}`)
+          this.garageTimeoutsWithoutAck += 1;
+          if (this.garageTimeoutsWithoutAck === 1) {
+            this.pushNotif('¿Todavía estás en camino a casa ?');
+            Alert.alert('Hey !', '¿ Aún estas ahí ?', [ {text: 'Si', onPress: () => { this.garageTimeoutsWithoutAck = 0 }} ], { cancelable: false } );
         } else if (this.garageTimeoutsWithoutAck === 2) {
-          // Si es el segundo, mando mails de emergencia...
           this.emergencyMail();
         }
       }
-  }
+    }
+
+//  ------------------------------------------------------------------ OLD
+      // if (data.lostGarageConnection) {
+      //     //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
+      //     this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
+      //     if (!this.lostGarageConnectionFired) {
+      //       this.lostGarageConnectionFired = true;
+      //       this.pushNotif('Introduce tu código');
+      //       this.startEmergencyCountdown();
+      //     }
+      // }
+      // if (data.garageSearchTimeout) {
+      //   this.garageTimeoutsWithoutAck += 1;
+      //   if (this.garageTimeoutsWithoutAck === 1) {
+      //     // Si es el primer timeout del garage...
+      //     this.pushNotif('¿Todavía estás en camino a casa ?');
+      //     Alert.alert(
+      //       'Hey !',
+      //       '¿ Aún estas ahí ?',
+      //       [
+      //         {text: 'Si', onPress: () => { this.garageTimeoutsWithoutAck = 0 }}
+      //       ],
+      //       { cancelable: false }
+      //     )
+      //   } else if (this.garageTimeoutsWithoutAck === 2) {
+      //     // Si es el segundo, mando mails de emergencia...
+      //     this.emergencyMail();
+      //   }
+      // }
+  // }
 
   startEmergencyCountdown = () => {
     this.state.emergencySecondsElapsed = 0;

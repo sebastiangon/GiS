@@ -16,7 +16,7 @@ bool rfConnected = false;
 bool madeRadioContact = false;
 bool madeBluetoothContact = false;
 long bTLastDisconnectionMillis = 0; //  Bluetooth disconnection data, to start counting when to stop the car
-long bluetoothDisconnectionMaxTime = 10000; //  This at last is the time to stop the car.
+long stopEngineTimeout = 10000; //  Time to stop the car, if the radio connection is lost after making contact.
 
 byte addresses[][6] = {"1Node","2Node"};
 
