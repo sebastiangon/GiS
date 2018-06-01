@@ -92,12 +92,20 @@ export default class App extends Component {
   handleSearchGarageTimeout = () => {
     this.pushNotif('¿Todavía estás en camino a casa ?');
     Alert.alert('Hey !', '¿ Aún estas en camino ? (15s)', [{ text: 'Si', onPress: this.restartGarageSearch }], { cancelable: false });
-    this.garageSearchKeepAliveTimeoutId = setTimeout(this.startEmergencyCountdown, GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT); //  Si no responde en ese tiempo...
+    this.garageSearchKeepAliveTimeoutId = setTimeout(this.handleGarageSearchTimeout, GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT); //  Si no responde en ese tiempo...
+  }
+
+  handleGarageSearchTimeout = () => {
+    this.garageSearchTimeoutId = null;
+    this.handleSendMails();
+    this.finishSequence();
   }
 
   restartGarageSearch = () => {
-    clearTimeout(this.garageSearchKeepAliveTimeoutId);
-    this.garageSearchTimeoutId = setTimeout(this.handleSearchGarageTimeout, GARAGE_SEARCH_TIME);  //  Restart garage search time
+    if (this.garageSearchTimeoutId !== null) { // If id is null, the garage timed out and finished sequence, dont RESTART COUNT
+      clearTimeout(this.garageSearchKeepAliveTimeoutId);
+      this.garageSearchTimeoutId = setTimeout(this.handleSearchGarageTimeout, GARAGE_SEARCH_TIME);  //  Restart garage search time
+    }
   }
 
   startEmergencyCountdown = () => {
