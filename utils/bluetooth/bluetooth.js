@@ -141,7 +141,7 @@ export class Bluetooth {
         console.log(`GiS: finish - finishing bluetooth connection`);
         this.forcedDisconnection = true; // Avoid reconnection when handleDisconnectedPeripheral
         if (this.peripheral) {
-            BleManager.disconnect(this.peripheral.id);
+            this.peripheral.id && BleManager.disconnect(this.peripheral.id);
             this.peripheral = null;
             this.reScanCount = 0;
             this.lastConnectionDate = null;

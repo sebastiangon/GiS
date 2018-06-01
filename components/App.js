@@ -18,6 +18,11 @@ import { appTabsEnum } from '../utils/appTabsEnum';
 import styles from './Styles';
 
 const SECURITY_CODE_TIMEOUT = 60; //  Seconds
+const GARAGE_SEARCH_TIME = 10000;  //  MiliSeconds
+const RADIO_RECONNECTION_TIMEOUT = 10000;  //  MiliSeconds
+const GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT = 15000;  //MiliSeconds
+const CHECK_BT_CONN_INTERVAL = 3000;  //  MiliSeconds
+
 const initialState = {
   activeTab: appTabsEnum.LANDING,
   carConnectionStatus: connectionStatusEnum.STOPPED,
@@ -33,12 +38,11 @@ export default class App extends Component {
     super();
     this.state = initialState;
     this.securityCodeCountdownId = null;
-    
+
     // Radio flags
-    this.garageSearchTime = 5000;
-    this.garageSearchTimeout = false;
-    this.garageTimeoutsWithoutAck = 0;
-    this.garageSearchTimeoutIntervalId = null;
+    this.garageSearchTimeoutId = null;
+    this.garageSearchKeepAliveTimeoutId = null;
+    this.lostRadioConnectionTimeoutId = null;
 
     this.bluetooth = null;
     this.checkCarConnectionsIntervalId = null;
@@ -51,86 +55,63 @@ export default class App extends Component {
   }
 
   onBluetoothConectionStateChange = (data) => {
-      this.setState({ carConnectionStatus: data.carConnectionStatus });
-      if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
-          this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
-
-          //  Set garage search timeout
-          console.log(`GiS: setting garageSearchTimeout`);
-          this.garageSearchTimeoutIntervalId = setInterval(this.garageSearchTime, () => { this.garageSearchTimeout = true; });
-
-          this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, 3000); //Comes back in onUpdateValueForCharacteristic 
-      } else {
-          clearInterval(this.checkCarConnectionsIntervalId);
-          if (data.carConnectionStatus === connectionStatusEnum.DISCONNECTED) {
-            this.startEmergencyCountdown();
-          } else if (data.carConnectionStatus === connectionStatusEnum.STOPPED) {
-            this.setState({startSequenceEnabled: true})
-          }
+    this.setState({ carConnectionStatus: data.carConnectionStatus });
+    if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
+      this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
+      clearInterval(this.garageSearchTimeoutId);
+      this.garageSearchTimeoutId = setTimeout(this.handleSearchGarageTimeout, GARAGE_SEARCH_TIME);
+      clearInterval(this.checkCarConnectionsIntervalId);
+      this.checkCarConnectionsIntervalId = setInterval(() => { this.bluetooth.sendMessageToPeripheral('Check State'); }, CHECK_BT_CONN_INTERVAL); //Comes back in onUpdateValueForCharacteristic 
+    } else {
+      clearInterval(this.checkCarConnectionsIntervalId); this.checkCarConnectionsIntervalId = null;
+      clearInterval(this.garageSearchTimeoutId);
+      if (data.carConnectionStatus === connectionStatusEnum.DISCONNECTED) {
+        this.startEmergencyCountdown();
+      } else if (data.carConnectionStatus === connectionStatusEnum.STOPPED) {
+        this.setState({ startSequenceEnabled: true })
       }
+    }
   }
 
   receiveBluetoothMessage = (data) => {
-      if (data.rfConnected) {
-          clearInterval(this.garageSearchTimeoutIntervalId);
-          this.garageSearchTimeout = false;
-          this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
-          this.stopEmergencyCountdown();
-      } else if (data.madeRadioContact) { //  If NOT connected but madeRadioConntact, we have lost the connection
-        // Do the necessary retries and start emergency when needed
-      }
-      else if (this.garageSearchTimeout) {  //  If NOT connected and NOT madeRadioContact, then keep searching... did de search time out ?
-          console.log(`GiS: receiveBluetoothMessage - garageSearchTimeout ${this.garageTimeoutsWithoutAck}`)
-          this.garageTimeoutsWithoutAck += 1;
-          if (this.garageTimeoutsWithoutAck === 1) {
-            this.pushNotif('¿Todavía estás en camino a casa ?');
-            Alert.alert('Hey !', '¿ Aún estas ahí ?', [ {text: 'Si', onPress: () => { this.garageTimeoutsWithoutAck = 0 }} ], { cancelable: false } );
-        } else if (this.garageTimeoutsWithoutAck === 2) {
-          this.emergencyMail();
-        }
+    console.log(`GiS: receiveBluetoothMessage - ${data.rfConnected} - ${data.madeRadioContact}`);
+    if (data.rfConnected) {
+      clearTimeout(this.lostRadioConnectionTimeoutId); this.lostRadioConnectionTimeoutId = null;  //  recover radio connection.
+      clearTimeout(this.garageSearchTimeoutId);  //  Stop searching garage
+      this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTED });
+      this.stopEmergencyCountdown();
+    } else if (data.madeRadioContact) { //  If NOT connected but madeRadioConntact, we have lost the connection
+      clearTimeout(this.garageSearchTimeoutId);  //  Stop searching garage, just in case rfConnected was not reset in the car's arduino
+      if (!this.lostRadioConnectionTimeoutId) {
+        this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });
+        this.lostRadioConnectionTimeoutId = setTimeout(this.startEmergencyCountdown, RADIO_RECONNECTION_TIMEOUT);  //  Wait 10 seconds for reconnection, else startEmergency
       }
     }
+  }
 
-//  ------------------------------------------------------------------ OLD
-      // if (data.lostGarageConnection) {
-      //     //  Fired after all the retries set in arduino sketch, no reconnection, display code, generate countdown to emergency mails
-      //     this.setState({ garageConnectionStatus: connectionStatusEnum.STOPPED });
-      //     if (!this.lostGarageConnectionFired) {
-      //       this.lostGarageConnectionFired = true;
-      //       this.pushNotif('Introduce tu código');
-      //       this.startEmergencyCountdown();
-      //     }
-      // }
-      // if (data.garageSearchTimeout) {
-      //   this.garageTimeoutsWithoutAck += 1;
-      //   if (this.garageTimeoutsWithoutAck === 1) {
-      //     // Si es el primer timeout del garage...
-      //     this.pushNotif('¿Todavía estás en camino a casa ?');
-      //     Alert.alert(
-      //       'Hey !',
-      //       '¿ Aún estas ahí ?',
-      //       [
-      //         {text: 'Si', onPress: () => { this.garageTimeoutsWithoutAck = 0 }}
-      //       ],
-      //       { cancelable: false }
-      //     )
-      //   } else if (this.garageTimeoutsWithoutAck === 2) {
-      //     // Si es el segundo, mando mails de emergencia...
-      //     this.emergencyMail();
-      //   }
-      // }
-  // }
+  handleSearchGarageTimeout = () => {
+    this.pushNotif('¿Todavía estás en camino a casa ?');
+    Alert.alert('Hey !', '¿ Aún estas en camino ? (15s)', [{ text: 'Si', onPress: this.restartGarageSearch }], { cancelable: false });
+    this.garageSearchKeepAliveTimeoutId = setTimeout(this.startEmergencyCountdown, GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT); //  Si no responde en ese tiempo...
+  }
+
+  restartGarageSearch = () => {
+    clearTimeout(this.garageSearchKeepAliveTimeoutId);
+    this.garageSearchTimeoutId = setTimeout(this.handleSearchGarageTimeout, GARAGE_SEARCH_TIME);  //  Restart garage search time
+  }
 
   startEmergencyCountdown = () => {
     this.state.emergencySecondsElapsed = 0;
-    clearInterval(this.securityCodeCountdownId);
-    this.securityCodeCountdownId = setInterval(this.emergencyMail, 1000);
+    clearInterval(this.securityCodeCountdownId); this.securityCodeCountdownId = null;
+    if (!this.securityCodeCountdownId) {
+      this.securityCodeCountdownId = setInterval(this.emergencyMail, 1000);
+    }
     this.setState({ promptSecurityCode: true });
   }
 
   stopEmergencyCountdown = () => {
     this.state.emergencySecondsElapsed = 0;
-    clearInterval(this.securityCodeCountdownId);
+    clearInterval(this.securityCodeCountdownId); this.securityCodeCountdownId = null;
     this.setState({ promptSecurityCode: false });
   }
 
@@ -139,18 +120,19 @@ export default class App extends Component {
     if (this.state.emergencySecondsElapsed >= SECURITY_CODE_TIMEOUT) {
       this.handleSendMails();
       this.stopEmergencyCountdown();
+      this.finishSequence();
     }
   }
 
   startSequence = () => {
-        this.bluetooth.init();
-        this.setState({ startSequenceEnabled: false });
+    this.bluetooth.init();
+    this.setState({ startSequenceEnabled: false });
   }
 
   finishSequence = () => {
-      // clearInterval(this.checkCarConnectionsIntervalId);
-      // this.bluetooth.finish();
-      this.setState({...initialState});
+    clearInterval(this.checkCarConnectionsIntervalId); this.checkCarConnectionsIntervalId = null;
+    this.bluetooth.finish();
+    this.setState({ ...initialState });
   }
 
   onCodeAsserted = () => {
@@ -176,8 +158,8 @@ export default class App extends Component {
     const emergencyContacts = await AsyncStorage.getItem(storage.EMERGENCY_CONTACTS);
     const userName = await AsyncStorage.getItem(storage.USER_NAME);
     if (emergencyContacts && userName) {
-        const contacts = JSON.parse(emergencyContacts);
-        mailService.sendMail(this.buildEmailList(contacts, userName));
+      const contacts = JSON.parse(emergencyContacts);
+      mailService.sendMail(this.buildEmailList(contacts, userName));
     }
   }
 
@@ -200,26 +182,26 @@ export default class App extends Component {
   }
 
   renderTab = (tab) => {
-    switch(tab){
-      case(appTabsEnum.EMERGENCY_CONTACTS):
+    switch (tab) {
+      case (appTabsEnum.EMERGENCY_CONTACTS):
         return <EmergencyContacts />;
-      case(appTabsEnum.LANDING):
-        return <Landing 
-          carConnectionStatus = {this.state.carConnectionStatus}
-          garageConnectionStatus = {this.state.garageConnectionStatus}
-          startSequenceEnabled = {this.state.startSequenceEnabled}
-          startSequence = {this.startSequence}
+      case (appTabsEnum.LANDING):
+        return <Landing
+          carConnectionStatus={this.state.carConnectionStatus}
+          garageConnectionStatus={this.state.garageConnectionStatus}
+          startSequenceEnabled={this.state.startSequenceEnabled}
+          startSequence={this.startSequence}
         />;
-      case(appTabsEnum.SETTINGS):
+      case (appTabsEnum.SETTINGS):
         return <Settings />;
       default:
         return 'INVALID_TAB_VALUE';
     }
   }
-  
+
   render() {
     if (this.state.promptSecurityCode) {
-      return (<SecurityCode codeMaxTriesExeded={this.onCodeMaxTriesExeded} remainingSeconds={SECURITY_CODE_TIMEOUT - this.state.emergencySecondsElapsed} codeAsserted={this.onCodeAsserted}/>);
+      return (<SecurityCode codeMaxTriesExeded={this.onCodeMaxTriesExeded} remainingSeconds={SECURITY_CODE_TIMEOUT - this.state.emergencySecondsElapsed} codeAsserted={this.onCodeAsserted} />);
     } else {
       return (
         <View style={styles.container}>
