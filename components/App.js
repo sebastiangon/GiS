@@ -32,7 +32,6 @@ const initialState = {
   emergencySecondsElapsed: 0
 };
 
-
 export default class App extends Component {
   constructor() {
     super();

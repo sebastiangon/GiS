@@ -19,11 +19,11 @@ export class Bluetooth {
         this.receiveBluetoothMessage = receiveBluetoothMessage;
 
         //BleManagerEmitter callbacks
-        this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',this.handleDiscoverPeripheral );
-        this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
-        this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
-        this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
-        this.updateState = bleManagerEmitter.addListener('BleManagerDidUpdateState', this.handleBLEUpdateState);
+        this.handlerDiscover    = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',this.handleDiscoverPeripheral );
+        this.handlerStop        = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan );
+        this.handlerDisconnect  = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
+        this.handlerUpdate      = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
+        this.updateState        = bleManagerEmitter.addListener('BleManagerDidUpdateState', this.handleBLEUpdateState);
         BleManager.start({showAlert: false}).then(() => { console.log('GiS: Bluetooth Module initialized, ready to start'); }).catch(() => {console.log('GiS: Fail on start BleManager')});
     }
 
