@@ -18,9 +18,9 @@ import { appTabsEnum } from '../utils/appTabsEnum';
 import styles from './Styles';
 
 const SECURITY_CODE_TIMEOUT = 60; //  Seconds
-const GARAGE_SEARCH_TIME = 10000;  //  MiliSeconds
+const GARAGE_SEARCH_TIME = 30000;  //  MiliSeconds
 const RADIO_RECONNECTION_TIMEOUT = 10000;  //  MiliSeconds
-const GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT = 15000;  //MiliSeconds
+const GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT = 30000;  //MiliSeconds
 const CHECK_BT_CONN_INTERVAL = 3000;  //  MiliSeconds
 
 const initialState = {
@@ -68,7 +68,10 @@ export default class App extends Component {
       if (data.carConnectionStatus === connectionStatusEnum.DISCONNECTED) {
         this.startEmergencyCountdown();
       } else if (data.carConnectionStatus === connectionStatusEnum.STOPPED) {
-        this.setState({ startSequenceEnabled: true })
+        this.setState({ 
+          startSequenceEnabled: true,
+          garageConnectionStatus: connectionStatusEnum.STOPPED
+        })
       }
     }
   }
@@ -91,7 +94,7 @@ export default class App extends Component {
 
   handleSearchGarageTimeout = () => {
     this.pushNotif('¿Todavía estás en camino a casa ?');
-    Alert.alert('Hey !', '¿ Aún estas en camino ? (15s)', [{ text: 'Si', onPress: this.restartGarageSearch }], { cancelable: false });
+    Alert.alert('Hey !', `¿ Aún estas en camino ? (${GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT/1000}s)`, [{ text: 'Si', onPress: this.restartGarageSearch }], { cancelable: false });
     this.garageSearchKeepAliveTimeoutId = setTimeout(this.handleGarageSearchTimeout, GARAGE_SEARCH_KEEP_ALIVE_TIMEOUT); //  Si no responde en ese tiempo...
   }
 

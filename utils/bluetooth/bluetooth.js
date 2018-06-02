@@ -135,6 +135,9 @@ export class Bluetooth {
     handleBLEUpdateState = (data) => {
         console.log(`GiS: Bluetooth BLE Update state - ${data.state}`);
         //  Estado del bluetooth del telefono, no de la conexion con el arduino --> this.bluetoothStatus = data.state; // 'on', 'off'
+        if (data.state === 'off') {
+            this.finish();
+        }
     }
 
     finish = () => {
