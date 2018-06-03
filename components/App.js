@@ -54,6 +54,7 @@ export default class App extends Component {
   }
 
   onBluetoothConectionStateChange = (data) => {
+    console.log(`GIS: onBluetoothConectionStateChange - ${data}`)
     this.setState({ carConnectionStatus: data.carConnectionStatus });
     if (data.carConnectionStatus === connectionStatusEnum.CONNECTED) {
       this.setState({ garageConnectionStatus: connectionStatusEnum.CONNECTING });

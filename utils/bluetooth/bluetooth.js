@@ -24,7 +24,14 @@ export class Bluetooth {
         this.handlerDisconnect  = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral );
         this.handlerUpdate      = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic );
         this.updateState        = bleManagerEmitter.addListener('BleManagerDidUpdateState', this.handleBLEUpdateState);
-        BleManager.start({showAlert: false}).then(() => { console.log('GiS: Bluetooth Module initialized, ready to start'); }).catch(() => {console.log('GiS: Fail on start BleManager')});
+       
+        BleManager.start({showAlert: false})
+            .then(() => {
+                console.log('GiS: Bluetooth Module initialized, ready to start'); 
+            })
+            .catch(() => {
+                console.log('GiS: Fail on start BleManager')
+            });
     }
 
     init = () => {
